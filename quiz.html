@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Open House IT Quest - Online Leaderboard Edition</title>
+    <title>Open House IT Quest - Mobile Perfect Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK (Firestore v10) -->
@@ -123,30 +123,36 @@
             justify-content: center;
         }
 
-        /* 🖼️ แก้ไขปัญหาภาพยืดเบี้ยวด้วยการล็อกสัดส่วน Aspect Ratio 5:4 */
         #game-container {
             position: relative;
             width: 100vw;
-            height: calc(100vw * 0.8);
+            height: 100dvh;
             max-width: 800px;
-            max-height: 600px;
-            aspect-ratio: 5 / 4;
+            max-height: 100dvh;
             background: #020617;
-            border-radius: 16px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(249, 115, 22, 0.3);
-            border: 2px solid #f97316;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            margin: auto;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* 📱 ปรับ HUD Bar สไตล์ Dark Glassmorphic เรียงสวย ไม่ซ้ำบรรทัด */
+        canvas {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        /* Top HUD Bar */
         #hud {
             position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
+            top: calc(env(safe-area-inset-top, 0px) + 8px);
+            left: 10px;
+            right: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -156,15 +162,15 @@
         }
 
         .hud-badge {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(249, 115, 22, 0.6);
+            border: 1.5px solid rgba(249, 115, 22, 0.7);
             padding: 4px 8px;
             border-radius: 14px;
             font-size: 10px;
             font-weight: 600;
             color: #ffffff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
             gap: 4px;
@@ -173,7 +179,7 @@
         }
 
         .hud-name-text {
-            max-width: 80px;
+            max-width: 75px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -191,21 +197,13 @@
             background: #c2410c;
         }
 
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: contain;
-            image-rendering: pixelated;
-        }
-
-        /* 🕹️ Virtual Joystick สไตล์โปร่งแสง สบายตา */
+        /* Virtual Joystick */
         #joystick-container {
             position: absolute;
-            bottom: 12px;
-            left: 12px;
-            width: 110px;
-            height: 110px;
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+            left: 16px;
+            width: 120px;
+            height: 120px;
             z-index: 30;
             display: flex;
             align-items: center;
@@ -214,14 +212,14 @@
         }
 
         #joystick-base {
-            width: 100px;
-            height: 100px;
-            background: rgba(15, 23, 42, 0.45);
-            border: 2px solid rgba(249, 115, 22, 0.7);
+            width: 110px;
+            height: 110px;
+            background: rgba(15, 23, 42, 0.55);
+            border: 2px solid rgba(249, 115, 22, 0.85);
             border-radius: 50%;
             position: relative;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -229,13 +227,13 @@
         }
 
         #joystick-stick {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             background: radial-gradient(circle at 35% 35%, #fb923c, #ea580c);
             border: 2px solid #ffffff;
             border-radius: 50%;
             position: absolute;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
             pointer-events: none;
             transform: translate(0px, 0px);
         }
@@ -251,19 +249,19 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 12px;
+            padding: 14px;
         }
 
         .card-box {
             position: relative;
             background: #ffffff;
             border: 3px solid #f97316;
-            border-radius: 18px;
+            border-radius: 20px;
             width: 100%;
             max-width: 440px;
-            max-height: 90vh;
+            max-height: 88vh;
             overflow-y: auto;
-            padding: 20px 16px;
+            padding: 22px 16px;
             box-shadow: 0 20px 50px rgba(249, 115, 22, 0.4);
             text-align: center;
             -webkit-overflow-scrolling: touch;
@@ -277,20 +275,16 @@
             color: #ffffff;
             border: 2px solid #ffffff;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(249, 115, 22, 0.35);
             transition: all 0.2s ease;
             z-index: 5;
-        }
-
-        .top-right-lb-btn:hover {
-            transform: scale(1.1) rotate(6deg);
         }
 
         .modal-title {
@@ -299,7 +293,7 @@
             color: #ea580c;
             margin-bottom: 4px;
             line-height: 1.4;
-            padding-right: 30px;
+            padding-right: 32px;
         }
 
         .start-subtext {
@@ -457,13 +451,51 @@
             background: #ffffff;
             border: 1.5px solid #fed7aa;
             color: #334155;
-            padding: 8px 10px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
             font-family: 'Kanit', sans-serif;
             font-weight: 600;
             text-align: left;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-btn.correct-ans {
+            background: #22c55e !important;
+            color: #ffffff !important;
+            border-color: #16a34a !important;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+        }
+
+        .quiz-btn.wrong-ans {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border-color: #dc2626 !important;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        .feedback-msg {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            min-height: 34px;
+            line-height: 1.3;
+        }
+        .feedback-success {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1.5px solid #86efac;
+        }
+        .feedback-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1.5px solid #fca5a5;
         }
 
         .lb-container {
@@ -596,7 +628,7 @@
                 <div class="modal-title" id="quiz-gate-num" style="font-size: 11px; padding-right: 0;">MISSION #1</div>
                 <div class="quiz-question" id="quiz-question">คำถามคอมพิวเตอร์...</div>
                 <div class="quiz-options" id="quiz-options"></div>
-                <div class="feedback-msg" id="quiz-feedback"></div>
+                <div class="feedback-msg" id="quiz-feedback" style="display: none;"></div>
             </div>
         </div>
 
@@ -743,63 +775,104 @@
             isMoving: false
         };
 
-        const questions = [
-            { 
-                q: "1. หากเปรียบระดับสัญญาณดิจิทัล 0 และ 1 ในวงจรคอมพิวเตอร์กับสิ่งของในชีวิตประจำวัน สิ่งใดตรงที่สุด?", 
-                options: ["สวิตช์ไฟสถานะ ปิด (0) และ เปิด (1)", "หลอดไฟติดๆ ดับๆ ตามจังหวะเพลง", "ประตูที่เปิดค้างไว้ครึ่งๆ กลางๆ", "ก๊อกน้ำที่น้ำหยดเรื่อยๆ ไม่ยอมหยุด"], 
-                ans: 0 
-            },
-            { 
-                q: "2. เมื่อคอมพิวเตอร์เกิดอาการค้าง แล้ววิศวกรบอกให้ \"ลองกด Restart ดู\" ขั้นตอนนี้ช่วยแก้ปัญหาเบื้องต้นจากเหตุใด?", 
-                options: ["ล้างข้อมูลชั่วคราวในหน่วยความจำ RAM ที่ค้างอยู่", "ช่วยให้ CPU ได้นอนพักผ่อนคลายความเครียด", "เป็นการระบายความร้อนออกจากเคสทันที", "ไล่ไวรัสให้หลุดออกจากสายไฟ"], 
-                ans: 0 
-            },
-            { 
-                q: "3. ในโครงสร้างสถาปัตยกรรมคอมพิวเตอร์ อุปกรณ์ใดทำหน้าที่เปรียบเสมือน \"สมอง\" คอยคิดและประมวลผลคำสั่งทั้งหมด?", 
-                options: ["CPU (Central Processing Unit)", "RAM (Random Access Memory)", "Hard Disk (HDD / SSD)", "Power Supply Unit"], 
-                ans: 0 
-            },
-            { 
-                q: "4. คำว่า \"Bug\" ที่ใช้เรียกข้อผิดพลาดในโปรแกรมคอมพิวเตอร์ มีที่มาจากเหตุการณ์ใดในอดีต?", 
-                options: ["แมลงชีปะขาวบินเข้าไปติดในเครื่องคำนวณหลอดสุญญากาศ", "แมลงสาบกัดสายสัญญาณเน็ตหลุด", "นักเขียนโปรแกรมตั้งชื่อตามสัตว์เลี้ยง", "ยุงบินบังหน้าจอทำให้พิมพ์โค้ดผิด"], 
-                ans: 0 
-            },
-            { 
-                q: "5. สิ่งใดต่อไปนี้ \"ไม่ใช่\" ระบบปฏิบัติการ (Operating System) ที่ใช้บริหารจัดการทรัพยากรเครื่องคอมพิวเตอร์?", 
-                options: ["Google Chrome", "Microsoft Windows", "Linux", "macOS"], 
-                ans: 0 
-            },
-            { 
-                q: "6. ตามกฎของโอห์ม (Ohm's Law) ซึ่งเป็นพื้นฐานวงจรอิเล็กทรอนิกส์ ความสัมพันธ์ของแรงดัน (V), กระแส (I) และความต้านทาน (R) คือข้อใด?", 
-                options: ["V = I × R", "V = I / R", "V = I + R", "V = R / I"], 
-                ans: 0 
-            },
-            { 
-                q: "7. ในวงจรลอจิกดิจิทัลมาตรฐานแบบ TTL (Transistor-Transistor Logic) ระดับแรงดันของ Logic HIGH มักมีค่าประมาณเท่าใด?", 
-                options: ["ประมาณ 5.0 โวลต์ (5V)", "ประมาณ 220 โวลต์ (220V)", "ประมาณ 12.0 โวลต์ (12V)", "ประมาณ 0.0 โวลต์ (0V)"], 
-                ans: 0 
-            },
-            { 
-                q: "8. ลอจิกเกต (Logic Gate) ชนิดใดที่จะส่งผลลัพธ์ออกเป็น 1 (HIGH) ก็ต่อเมื่อค่าอินพุตทั้งหมดเป็น 1 (HIGH) เท่านั้น?", 
-                options: ["AND Gate", "OR Gate", "NOT Gate", "XOR Gate"], 
-                ans: 0 
-            },
-            { 
-                q: "9. ในระบบเครือข่ายคอมพิวเตอร์ หมายเลข IP Address รูปแบบ IPv4 ประกอบด้วยขนาดข้อมูลกี่บิต (Bits)?", 
-                options: ["32 บิต", "64 บิต", "128 บิต", "16 บิต"], 
-                ans: 0 
-            },
-            { 
-                q: "10. ในสถาปัตยกรรมหน่วยประมวลผลกลางแบบ Pipelining ปรากฏการณ์ \"Data Hazard\" เกิดขึ้นจากสาเหตุใดเป็นหลัก?", 
-                options: [
-                    "คำสั่งปัจจุบันต้องใช้อนุพันธ์ผลลัพธ์จากคำสั่งก่อนหน้าที่ยังประมวลผลในขั้นตอน Execute ไม่เสร็จสิ้น", 
-                    "การทำนายทิศทางคำสั่งเงื่อนไข (Branch Prediction) ผิดพลาดทำให้ต้อง Flush Pipeline", 
-                    "เกิดความแออัดในการเข้าถึงบัสฮาร์ดแวร์หรือหน่วยความจำหลักพร้อมกันในหนึ่งรอบสัญญาณนาฬิกา", 
-                    "สัญญาณนาฬิกา (Clock Signal) เกิดการสูญเสียจังหวะซิงโครไนซ์ระหว่าง Register File"
-                ], 
-                ans: 0 
+        // ================= 📚 คลังคำถาม 60 ข้อ (ปรับสมดุลความยาวช้อยส์ 100%) =================
+        const questionPool = {
+            easy: [
+                { q: "หากเปรียบระดับสัญญาณดิจิทัล 0 และ 1 ในคอมพิวเตอร์กับสิ่งของในชีวิตประจำวัน สิ่งใดตรงที่สุด?", options: ["สวิตช์ไฟที่เปิด (1) หรือ ปิด (0)", "หลอดไฟที่เร่งความสว่าง (1) ถึง (0)", "ประตูที่เปิดค้างไว้ระหว่าง (1) ถึง (0)", "พัดลมที่ปรับระดับความเร็ว (1) ถึง (0)"], ans: 0 },
+                { q: "เมื่อคอมพิวเตอร์เกิดอาการค้าง แล้วบอกให้ \"ลองกด Restart ดู\" ขั้นตอนนี้ช่วยแก้ปัญหาจากเหตุใด?", options: ["การเคลียร์ข้อมูลชั่วคราวใน RAM ที่ค้างอยู่", "การลบไฟล์ขยะและไวรัสในระบบปฏิบัติการ", "การระบายความร้อนออกจากชิปประมวลผล CPU", "การปรับระดับแรงดันไฟฟ้าในแผงวงจรหลัก"], ans: 0 },
+                { q: "คำว่า \"Bug\" ที่ใช้เรียกข้อผิดพลาดในโปรแกรมคอมพิวเตอร์ มีที่มาจากเหตุการณ์ใดในอดีต?", options: ["แมลงชีปะขาวบินติดในเครื่องคำนวณหลอดสุญญากาศ", "สายเคเบิลถูกแมลงและสัตว์กัดจนขาดเสียหาย", "ฝุ่นละอองเกาะวงจรไฟฟ้าจนเกิดความร้อนสูง", "สัญญาณความถี่วิทยุแทรกซ้อนในวงจรคอมพิวเตอร์"], ans: 0 },
+                { q: "ปุ่ม Ctrl + Z บนคีย์บอร์ดคอมพิวเตอร์ เปรียบเสมือนอะไรในชีวิตจริง?", options: ["การย้อนกลับการทำงานล่าสุด (Undo)", "การยกเลิกคำสั่งพิมพ์เอกสาร (Cancel)", "การลบข้อความที่เลือกทิ้งทันที (Delete)", "การสลับไปยังหน้าต่างก่อนหน้า (Switch)"], ans: 0 },
+                { q: "อุปกรณ์ใดในคอมพิวเตอร์ทำหน้าที่เปรียบเสมือน \"สมอง\" คอยคิดและประมวลผลคำสั่ง?", options: ["หน่วยประมวลผลกลาง (CPU)", "หน่วยความจำหลัก (RAM)", "หน่วยจัดเก็บข้อมูล (SSD)", "หน่วยจ่ายกระแสไฟฟ้า (PSU)"], ans: 0 },
+                { q: "\"RAM\" ในคอมพิวเตอร์ต่างจาก \"Hard Disk\" อย่างไร?", options: ["RAM เก็บข้อมูลชั่วคราว ส่วน Hard Disk เก็บถาวร", "RAM เก็บไฟล์ระบบ ส่วน Hard Disk เก็บไฟล์รูปภาพ", "RAM ใช้แสดงผลภาพ ส่วน Hard Disk ใช้คำนวณข้อมูล", "RAM ทำงานช้ากว่า ส่วน Hard Disk ทำงานได้ไวกว่า"], ans: 0 },
+                { q: "สิ่งใดต่อไปนี้ \"ไม่ใช่\" ระบบปฏิบัติการ (Operating System)?", options: ["Google Chrome Browser", "Microsoft Windows 11", "Linux Ubuntu System", "Apple macOS Ventura"], ans: 0 },
+                { q: "การทำ \"Phishing\" ในโลกไอที หมายถึงพฤติกรรมใด?", options: ["การสร้างเว็บไซต์ปลอมหลอกเอาข้อมูลและรหัสผ่าน", "การแอบเจาะระบบเน็ตเวิร์กเพื่อดักจับไฟล์ข้อมูลงาน", "การส่งไวรัสผ่านสายเคเบิลเพื่อลบไฟล์ข้อมูลในเครื่อง", "การเปิดหน้าเว็บทิ้งไว้หลายหน้าจนเครื่องเกิดอาการค้าง"], ans: 0 },
+                { q: "เมื่อกด Empty Recycle Bin ใน Windows ข้อมูลในไฟล์นั้นจะเกิดอะไรขึ้น?", options: ["การลบดัชนีชี้ตำแหน่งไฟล์เพื่อเตรียมเขียนทับ", "การบีบอัดไฟล์ทั้งหมดไปซ่อนไว้ในระบบสำรอง", "การส่งไฟล์ทั้งหมดขึ้นไปเก็บไว้บนระบบคลาวด์", "การทำการฟอร์แมตฮาร์ดดิสก์ใหม่ทั้งลูกทันที"], ans: 0 },
+                { q: "โหมด Incognito (หน้าต่างส่วนตัว) ในเว็บเบราว์เซอร์ ป้องกันสิ่งใด?", options: ["ไม่บันทึกประวัติการท่องเว็บและคุกกี้ในเครื่องเรา", "ซ่อนตำแหน่ง IP Address จากผู้ให้บริการอินเทอร์เน็ต", "ป้องกันไวรัสและมัลแวร์เข้าสู่คอมพิวเตอร์ 100%", "บล็อกโฆษณาและสคริปต์บนหน้าเว็บทั้งหมดอัตโนมัติ"], ans: 0 },
+                { q: "ชื่อเทคโนโลยีเชื่อมต่อไร้สาย \"Bluetooth\" มีที่มาจากสิ่งใด?", options: ["ฉายาของกษัตริย์ไวกิ้งในอดีต (Harald Bluetooth)", "ชื่อค่ายนักวิจัยผู้ค้นพบคลื่นวิทยุ (Robert Bluetooth)", "ชื่อสายพันธุ์สัตว์น้ำใต้ทะเลลึก (Blue Tooth Shark)", "ยี่ห้ออุปกรณ์สื่อสารยุคแรก (Bluetooth Mobile)"], ans: 0 },
+                { q: "ทำไมสาย LAN ถึงต้องตีเกลียวเป็นคู่ๆ (Twisted Pair)?", options: ["การลดสัญญาณรบกวนข้ามสาย (Crosstalk)", "การเพิ่มความแข็งแรงทนทาน (Durability)", "การขยายความกว้างช่องสัญญาณ (Bandwidth)", "การประหยัดพื้นที่จัดเก็บสาย (Space Saving)"], ans: 0 },
+                { q: "ข้อใดคือความหมายของคำว่า \"Cloud Storage\"?", options: ["การฝากไฟล์ไว้บนเซิร์ฟเวอร์ผ่านอินเทอร์เน็ต", "การเชื่อมต่อฮาร์ดดิสก์แบบไร้สายระยะใกล้", "การเก็บบันทึกข้อมูลลงในชิประบบดาวเทียม", "การบีบอัดไฟล์เอกสารให้มีขนาดเล็กลงมาก"], ans: 0 },
+                { q: "ระบบ \"CAPTCHA\" ที่ให้เราติ๊กเลือกรูปภาพก่อนเข้าเว็บ มีไว้เพื่ออะไร?", options: ["การแยกแยะระหว่างผู้ใช้มนุษย์กับโปรแกรมบอท", "การตรวจสอบความไวในการพิมพ์และตอบสนองของผู้ใช้", "การป้องกันความร้อนสูงของเครื่องเซิร์ฟเวอร์เว็บไซต์", "การบันทึกข้อมูลพฤติกรรมการซื้อสินค้าของผู้ใช้งาน"], ans: 0 },
+                { q: "การตั้งรหัสผ่านข้อใดปลอดภัยและเดายากที่สุดตามหลัก Cyber Security?", options: ["P@ssW0rd_CPE#2026", "K@seTsart_U#2026", "S3cur3_Syt3m#2026", "Admin_N3tw0rk#2026"], ans: 0 },
+                { q: "ปุ่ม F5 บนคีย์บอร์ดขณะใช้งานเว็บเบราว์เซอร์มีไว้ทำอะไร?", options: ["การโหลดหน้าเว็บปัจจุบันใหม่ (Refresh Page)", "การปิดหน้าต่างโปรแกรมทันที (Close Window)", "การเปิดโหมดการแสดงผลเต็มจอ (Full Screen)", "การค้นหาคำในหน้าเว็บปัจจุบัน (Find Text)"], ans: 0 },
+                { q: "มัลแวร์ประเภท \"Ransomware\" มีพฤติกรรมอันตรายอย่างไร?", options: ["การเข้ารหัสล็อกไฟล์ข้อมูลแล้วขู่เรียกค่าไถ่", "การแอบเปิดกล้องและไมโครโฟนเพื่อดักฟังข้อมูล", "การลบไฟล์ระบบปฏิบัติการทิ้งจนเครื่องเปิดไม่ติด", "การสั่งให้เครื่องขุดเหรียญคริปโทจนเกิดความร้อนสูง"], ans: 0 },
+                { q: "นามสกุลไฟล์เอกสารยอดนิยมแบบ \".pdf\" ย่อมาจากอะไร?", options: ["Portable Document Format", "Personal Data File System", "Public Digital Format Type", "Printed Document Process"], ans: 0 },
+                { q: "ทำไมซื้อ Flash Drive 16GB พอนำมาเสียบเครื่องคอมถึงเห็นความจุแค่ประมาณ 14.8GB?", options: ["คอมพิวเตอร์นับฐานสอง แต่ผู้ผลิตนับฐานสิบ", "ระบบปฏิบัติการจองพื้นที่ไว้ใช้ทำระบบสำรอง", "ตารางดัชนีไฟล์ยึดพื้นที่บางส่วนไปใช้งาน", "ชิปบันทึกข้อมูลมีพื้นที่สูญเสียจากการผลิต"], ans: 0 },
+                { q: "ชิปประมวลผล \"GPU\" ย่อมาจากอะไรและเน้นประมวลผลสิ่งใด?", options: ["Graphics Processing Unit (เน้นภาพ 3D)", "General Processing Unit (เน้นคำสั่งทั่วไป)", "Global Processing Unit (เน้นพิกัดดาวเทียม)", "Gigabyte Processing Unit (เน้นจัดการ RAM)"], ans: 0 },
+                { q: "อาการ \"Blue Screen of Death (BSOD)\" บน Windows เกิดจากสาเหตุใด?", options: ["ข้อผิดพลาดร้ายแรงของระบบปฏิบัติการหรือฮาร์ดแวร์", "การติดไวรัสคอมพิวเตอร์ที่ทำการลบไฟล์วอลเปเปอร์", "จอภาพเกิดความเสียหายทางกายภาพจนไม่แสดงสีภาพ", "สัญญาณอินเทอร์เน็ตขาดหายขณะกำลังอัปเดตระบบ"], ans: 0 },
+                { q: "ข้อผิดพลาด \"404 Not Found\" บนเว็บเบราว์เซอร์หมายถึงสิ่งใด?", options: ["ไม่พบหน้าเว็บที่ต้องการบนเครื่องเซิร์ฟเวอร์", "ปฏิเสธการเข้าถึงเนื่องจากรหัสผ่านไม่ถูกต้อง", "เซิร์ฟเวอร์ปลายทางตอบสนองช้าเกินเวลากำหนด", "การเชื่อมต่อเครือข่ายอินเทอร์เน็ตหลุดขัดข้อง"], ans: 0 },
+                { q: "หน้าที่หลักของ Power Supply (PSU) ในคอมพิวเตอร์คืออะไร?", options: ["การแปลงไฟบ้าน AC เป็น DC จ่ายให้อุปกรณ์", "การสำรองกระแสไฟฟ้าเมื่อเกิดเหตุการณ์ไฟดับ", "การควบคุมและระบายความร้อนให้เคสคอมพิวเตอร์", "การควบคุมจังหวะสัญญาณนาฬิกาให้เมนบอร์ด"], ans: 0 },
+                { q: "คำว่า \"AI\" ย่อมาจากคำว่าอะไร?", options: ["Artificial Intelligence", "Advanced Integration", "Automated Interface", "Algorithm Information"], ans: 0 },
+                { q: "\"Cookie\" ในเว็บไซต์ทำหน้าที่อะไร?", options: ["ไฟล์ขนาดเล็กที่เว็บบันทึกเพื่อจำสถานะผู้ใช้", "สคริปต์อันตรายที่แอบดักจับรหัสผ่านของผู้ใช้", "ไฟล์ขยะชั่วคราวที่สร้างขึ้นเมื่อเปิดดูวิดีโอ", "โปรแกรมช่วยเร่งความเร็วการดาวน์โหลดไฟล์"], ans: 0 },
+                { q: "โปรแกรม Anti-Virus ตรวจจับไวรัสในเครื่องด้วยวิธีใดเป็นหลัก?", options: ["การตรวจสอบเทียบกับฐานข้อมูลลายเซ็น (Signatures)", "การตรวจสอบความร้อนของชิป CPU ขณะรันไฟล์งาน", "การตรวจสอบขนาดไฟล์ที่เพิ่มขึ้นในฮาร์ดดิสก์เครื่อง", "การตรวจสอบการใช้งานอินเทอร์เน็ตของโปรแกรมต่างๆ"], ans: 0 },
+                { q: "สัญญาณไฟแสดงสถานะการรับส่งข้อมูลของพอร์ต LAN มักมีสีอะไรบ้าง?", options: ["สีเขียว (Link) และ สีส้ม (Activity)", "สีแดง (Power) และ สีน้ำเงิน (Data)", "สีขาว (Online) และ สีม่วง (Error)", "สีเหลือง (Speed) และ สีฟ้า (Status)"], ans: 0 },
+                { q: "การกดคีย์ลัด Alt + F4 บนระบบปฏิบัติการ Windows ผลลัพธ์คืออะไร?", options: ["การปิดโปรแกรมหรือหน้าต่างที่กำลังใช้งานอยู่", "การเปิดหน้าต่างเครื่องคิดเลขระบบ (Calculator)", "การสลับการแสดงผลไปยังหน้าจอหลัก (Desktop)", "การรีสตาร์ตระบบปฏิบัติการทันทีโดยไม่ถามผู้ใช้"], ans: 0 },
+                { q: "คำว่า \"Pixel\" ในหน้าจอแสดงผลหมายถึงอะไร?", options: ["จุดสีเล็กๆ ที่ประกอบกันเป็นภาพบนหน้าจอ", "อัตราความไวในการตอบสนองของแผงวงจรจอภาพ", "ความจุของหน่วยความจำการ์ดแสดงผลภาพกราฟิก", "ระดับความสว่างสูงสุดของหลอดภาพหน้าจอคอม"], ans: 0 },
+                { q: "คำว่า \"URL\" ที่เราใช้พิมพ์ที่อยู่เว็บไซต์ ย่อมาจากคำว่าอะไร?", options: ["Uniform Resource Locator", "Universal Radio Link System", "User Route List Protocol", "Unified Record Lane Access"], ans: 0 }
+            ],
+            medium: [
+                { q: "ตามกฎของโอห์ม (Ohm's Law) ความสัมพันธ์ของแรงดัน (V), กระแส (I) และความต้านทาน (R) คือข้อใด?", options: ["V = I × R (แรงดัน = กระแส × ความต้านทาน)", "V = I / R (แรงดัน = กระแส / ความต้านทาน)", "V = I + R (แรงดัน = กระแส + ความต้านทาน)", "V = R / I (แรงดัน = ความต้านทาน / กระแส)"], ans: 0 },
+                { q: "ในวงจรลอจิกดิจิทัลมาตรฐานแบบ TTL ระดับแรงดันของ Logic HIGH มีค่าประมาณเท่าใด?", options: ["2.0V ถึง 5.0V (Logic HIGH)", "0.0V ถึง 0.8V (Logic HIGH)", "12.0V ถึง 24.0V (Logic HIGH)", "110.0V ถึง 220.0V (Logic HIGH)"], ans: 0 },
+                { q: "ลอจิกเกต (Logic Gate) ชนิดใดให้ผลลัพธ์เป็น 1 (HIGH) เมื่ออินพุตทั้งหมดเป็น 1 (HIGH) เท่านั้น?", options: ["AND Gate (แอนด์เกต)", "OR Gate (ออร์เกต)", "NOT Gate (น็อตเกต)", "XOR Gate (เอ็กซ์ออร์เกต)"], ans: 0 },
+                { q: "หมายเลข IP Address รูปแบบ IPv4 ประกอบด้วยขนาดข้อมูลกี่บิต (Bits)?", options: ["32 บิต (4 อกเตต)", "64 บิต (8 อกเตต)", "128 บิต (16 อกเตต)", "16 บิต (2 อกเตต)"], ans: 0 },
+                { q: "ระบบจัดหมวดหมู่ IP Address แบบ IPv6 มีขนาดกี่บิต (Bits) เพื่อรองรับจำนวนอุปกรณ์ที่เพิ่มขึ้น?", options: ["128 บิต (16 อกเตต)", "64 บิต (8 อกเตต)", "256 บิต (32 อกเตต)", "32 บิต (4 อกเตต)"], ans: 0 },
+                { q: "สถาปัตยกรรมคอมพิวเตอร์แบบ Von Neumann ประกอบด้วยส่วนประกอบหลักใดบ้าง?", options: ["CPU, Memory, I/O Devices", "GPU, VRAM, Power Supply", "Display, Keyboard, Storage", "ALU, Control Unit, Register"], ans: 0 },
+                { q: "โปรโตคอล HTTPS ปลอดภัยกว่า HTTP แบบเดิมเนื่องจากมีการเข้ารหัสด้วยโปรโตคอลใด?", options: ["TLS / SSL (Transport Layer Security)", "SSH / FTP (Secure Shell Protocol)", "UDP / IP (User Datagram Protocol)", "DNS / DHCP (Domain Name System)"], ans: 0 },
+                { q: "โครงสร้างข้อมูล (Data Structure) แบบ Stack ทำงานด้วยหลักการใด?", options: ["LIFO (Last In, First Out)", "FIFO (First In, First Out)", "FILO (First In, Last Out)", "Random Access Allocation"], ans: 0 },
+                { q: "โครงสร้างข้อมูลแบบ Queue ทำงานด้วยหลักการใด?", options: ["FIFO (First In, First Out)", "LIFO (Last In, First Out)", "Priority Queue Allocation", "Direct Memory Access"], ans: 0 },
+                { q: "ลอจิกเกต NAND Gate เกิดจากการนำเกตใดมาต่อรวมกัน?", options: ["AND Gate ต่อรวมกับ NOT Gate", "OR Gate ต่อรวมกับ NOT Gate", "XOR Gate ต่อรวมกับ AND Gate", "NOR Gate ต่อรวมกับ OR Gate"], ans: 0 },
+                { q: "พอร์ตการสื่อสารมาตรฐาน (Port Number) ของโปรโตคอล HTTP คือพอร์ตใด?", options: ["Port 80 (HTTP Default)", "Port 443 (HTTPS Default)", "Port 21 (FTP Default)", "Port 22 (SSH Default)"], ans: 0 },
+                { q: "พอร์ตการสื่อสารมาตรฐานของโปรโตคอล HTTPS คือพอร์ตใด?", options: ["Port 443 (HTTPS Default)", "Port 80 (HTTP Default)", "Port 8080 (Proxy Default)", "Port 25 (SMTP Default)"], ans: 0 },
+                { q: "คำสั่งภาษา SQL ข้อใดใช้สำหรับการดึงข้อมูลออกจากฐานข้อมูล?", options: ["SELECT (ดึงข้อมูล)", "INSERT (เพิ่มข้อมูล)", "UPDATE (แก้ไขข้อมูล)", "DELETE (ลบข้อมูล)"], ans: 0 },
+                { q: "กระบวนการ \"Compilation\" ในการเขียนโปรแกรมหมายถึงสิ่งใด?", options: ["การแปลง Source Code เป็น Machine Code", "การตรวจสอบและค้นหา Bug ในโปรแกรม", "การติดตั้งไฟล์โปรแกรมลงในฮาร์ดดิสก์", "การจัดสรรพื้นที่หน่วยความจำให้โปรแกรม"], ans: 0 },
+                { q: "ในระบบปฏิบัติการ สภาวะ \"Deadlock\" คือสถานะแบบใด?", options: ["Process รอคอยทรัพยากรซึ่งกันและกันจนค้าง", "RAM เต็มจนระบบปฏิบัติการหยุดการทำงาน", "Hard Disk ชำรุดจนไม่สามารถอ่านไฟล์ได้", "สัญญาณ Clock เกิดความล่าช้ากว่ากำหนด"], ans: 0 },
+                { q: "หน้าที่หลักของ DNS Server (Domain Name System) คืออะไร?", options: ["การแปลงชื่อ Domain Name ให้เป็น IP Address", "การป้องกันและกรองผู้บุกรุกเข้าสู่ระบบเครือข่าย", "การจัดสรรหมายเลข IP Address ให้เครื่องลูกข่าย", "การจัดเก็บข้อมูลไฟล์บนเว็บไซต์ทั้งหมดไว้ในเซิร์ฟเวอร์"], ans: 0 },
+                { q: "หน่วยความจำ Cache ใน CPU มีหน้าที่สำคัญอย่างไร?", options: ["การบันทึกข้อมูลที่ใช้บ่อยเพื่อให้ CPU อ่านได้ไว", "การจัดเก็บไฟล์ภาพและวิดีโอที่มีขนาดใหญ่มาก", "การสำรองข้อมูลในวงจรเมื่อเกิดเหตุการณ์ไฟดับ", "การเชื่อมต่อสัญญาณข้อมูลกับอุปกรณ์ภายนอก"], ans: 0 },
+                { q: "อัลกอริทึมการเรียงลำดับแบบ \"Bubble Sort\" มี Time Complexity เฉลี่ยเป็นเท่าใด?", options: ["O(n²) (Quadratic Time)", "O(n log n) (Linearithmic Time)", "O(n) (Linear Time)", "O(1) (Constant Time)"], ans: 0 },
+                { q: "ข้อใดคือหน้าที่ของ MAC Address ในระบบเครือข่ายคอมพิวเตอร์?", options: ["หมายเลขอ้างอิงทางกายภาพของอุปกรณ์การ์ดเน็ตเวิร์ก (NIC)", "หมายเลขระบุตำแหน่งพิกัด GPS ของเครื่องคอมพิวเตอร์", "หมายเลขบัญชีผู้ใช้งานที่ลงทะเบียนในระบบปฏิบัติการ", "หมายเลขสุ่มชั่วคราวที่เปลี่ยนไปทุกครั้งที่เปิดเครื่องใหม่"], ans: 0 },
+                { q: "เทคโนโลยี Virtual Memory ในระบบปฏิบัติการ มีประโยชน์อย่างไร?", options: ["การใช้พื้นที่บางส่วนของ Disk จำลองเป็น RAM", "การเร่งความเร็วการ์ดจอให้ประมวลผลได้ดีขึ้น", "การจำลองระบบปฏิบัติการอื่นขึ้นมาเปิดใช้งาน", "การบีบอัดข้อมูลในหน่วยความจำหลักให้เพิ่มขึ้น"], ans: 0 },
+                { q: "ในทางอิเล็กทรอนิกส์ ตัวต้านทาน (Resistor) มีหน้าที่อะไรในวงจร?", options: ["การจำกัดและต่อต้านการไหลของกระแสไฟฟ้า", "การเก็บสะสมประจุไฟฟ้าเพื่อจ่ายในวงจร", "การแปลงสัญญาณกระแสสลับเป็นกระแสตรง", "การขยายความถี่และกำลังของสัญญาณไฟฟ้า"], ans: 0 },
+                { q: "วงจร Flip-Flop ในระบบดิจิทัลใช้ทำหน้าที่อะไรเป็นหลัก?", options: ["การเก็บบันทึกข้อมูลดิจิทัลขนาด 1 บิต", "การสลับทิศทางการไหลของกระแสไฟฟ้า", "การสร้างสัญญาณนาฬิกากำหนดจังหวะชิป", "การลดความต้านทานไฟฟ้าในวงจรอิเล็กทรอนิกส์"], ans: 0 },
+                { q: "ความแตกต่างหลักระหว่างโปรโตคอล TCP และ UDP คือข้อใด?", options: ["TCP เน้นความถูกต้อง ส่วน UDP เน้นความรวดเร็ว", "TCP ใช้ส่งข้อความ ส่วน UDP ใช้ส่งไฟล์ขนาดใหญ่", "TCP ทำงานไร้สาย ส่วน UDP ต้องเชื่อมสาย LAN", "TCP มีความปลอดภัยต่ำ ส่วน UDP มีความปลอดภัยสูง"], ans: 0 }
+            ],
+            hard: [
+                { q: "ในสถาปัตยกรรม CPU แบบ Pipelining ปรากฏการณ์ \"Data Hazard\" เกิดจากสาเหตุใด?", options: ["คำสั่งปัจจุบันต้องใช้ผลลัพธ์จากคำสั่งก่อนที่ยังประมวลผลไม่เสร็จ", "การทำนายทิศทางคำสั่งเงื่อนไข (Branch Prediction) เกิดความผิดพลาด", "เกิดความแออัดในการเข้าถึงบัสฮาร์ดแวร์หรือหน่วยความจำพร้อมกัน", "สัญญาณนาฬิกา (Clock Signal) เกิดการสูญเสียจังหวะซิงโครไนซ์"], ans: 0 },
+                { q: "ทฤษฎีบท CAP Theorem ในระบบ Distributed Database ระบุว่ารับประกันคุณสมบัติได้เพียง 2 ใน 3 ข้อ คือข้อใด?", options: ["Consistency, Availability, Partition Tolerance", "Concurrency, Accuracy, Performance Metric", "Capacity, Availability, Processing Control", "Control, Authentication, Protection Logic"], ans: 0 },
+                { q: "อัลกอริทึมการเข้ารหัสแบบ RSA (Asymmetric Encryption) อาศัยความยากทางคณิตศาสตร์เรื่องใดเป็นหลัก?", options: ["การแยกตัวประกอบจำนวนเฉพาะขนาดใหญ่ (Prime Factorization)", "การคำนวณดีเทอร์มิแนนต์ของเมทริกซ์เอกลักษณ์ (Matrix Determinant)", "การแปลงอนุกรมฟูเรียร์เชิงซ้อน (Complex Fourier Transform)", "การแก้สมการดิฟเฟอเรนเชียลอันดับสูง (Differential Equation)"], ans: 0 },
+                { q: "ในวิชา Computer Architecture เทคนิค \"Branch Prediction\" มีไว้เพื่อแก้ปัญหา Hazard ประเภทใด?", options: ["Control Hazard (Branch Hazard)", "Data Hazard (Read-After-Write)", "Structural Hazard (Resource Collision)", "Memory Hazard (Cache Miss Collision)"], ans: 0 },
+                { q: "กลไก \"Page Fault\" ในระบบ Virtual Memory เกิดขึ้นเมื่อใด?", options: ["CPU เรียกใช้ Memory Page ที่ยังไม่ได้ถูกโหลดขึ้น RAM จริง", "แผงหน่วยความจำ RAM เกิดความเสียหายทางกายภาพในวงจร", "โปรแกรมเขียนข้อมูลเกินขอบเขตโครงสร้างอาร์เรย์ (Array Overflow)", "เกิดไฟล์ขยะสะสมในระบบปฏิบัติการมากเกินเกณฑ์ที่กำหนด"], ans: 0 },
+                { q: "ข้อใดอธิบายหลักการของ ACID Properties ในระบบ Transactional Database ได้ถูกต้อง?", options: ["Atomicity, Consistency, Isolation, Durability", "Accuracy, Control, Integrity, Data Protection", "Access, Connection, Indexing, Deletion Logic", "Authentication, Cipher, Inspection, Defense Rules"], ans: 0 },
+                { q: "ทฤษฎีการสุ่มตัวอย่างของ Nyquist-Shannon ระบุว่าอัตราการสุ่มตัวอย่าง (Sampling Rate) ต้องเป็นอย่างไรเทียบกับความถี่สูงสุด (f_max)?", options: ["อย่างน้อย 2 เท่าของความถี่สูงสุด (2 × f_max)", "เท่ากับความถี่สูงสุดพอดี (1 × f_max)", "เป็นครึ่งหนึ่งของความถี่สูงสุด (0.5 × f_max)", "มากกว่า 10 เท่าของความถี่สูงสุด (10 × f_max)"], ans: 0 }
+            ]
+        };
+
+        let currentQuizQuestions = [];
+
+        function shuffleArray(arr) {
+            let array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
-        ];
+            return array;
+        }
+
+        // 🎲 ฟังก์ชันสุ่มดึงข้อสอบ (ง่าย 5 ข้อ, ปานกลาง 3 ข้อ, ยาก 2 ข้อ รวม 10 ข้อ) พร้อมสลับช้อยส์
+        function prepareRandomQuestions() {
+            const easySample = shuffleArray(questionPool.easy).slice(0, 5);
+            const medSample = shuffleArray(questionPool.medium).slice(0, 3);
+            const hardSample = shuffleArray(questionPool.hard).slice(0, 2);
+
+            const selectedPool = [...easySample, ...medSample, ...hardSample];
+
+            currentQuizQuestions = selectedPool.map(qObj => {
+                let opts = qObj.options.map((opt, i) => ({ opt, isCorrect: i === qObj.ans }));
+                opts = shuffleArray(opts);
+                return {
+                    q: qObj.q,
+                    shuffledOptions: opts
+                };
+            });
+        }
 
         const ballTargets = [
             { id: 0, x: 10 * TILE_SIZE, y: 11 * TILE_SIZE, active: true },
@@ -925,6 +998,8 @@
         function startGame() {
             if (checkPlayRestriction()) return;
 
+            prepareRandomQuestions();
+
             document.getElementById('player-disp-name').innerText = playerName;
             document.getElementById('start-modal').style.display = 'none';
 
@@ -1012,44 +1087,56 @@
             resetKeys();
             isQuizOpen = true;
             activeTarget = ball;
-            const q = questions[ball.id];
+            
+            const q = currentQuizQuestions[ball.id];
 
             document.getElementById('quiz-gate-num').innerText = `FOOTBALL MISSION #${ball.id + 1}`;
             document.getElementById('quiz-question').innerText = q.q;
-            document.getElementById('quiz-feedback').innerText = '';
+            
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'none';
+            feedback.innerText = '';
 
             const optionsContainer = document.getElementById('quiz-options');
             optionsContainer.innerHTML = '';
 
-            let opts = q.options.map((opt, i) => ({ opt, isCorrect: i === q.ans }));
-            opts.sort(() => Math.random() - 0.5);
-
-            opts.forEach((item, idx) => {
+            q.shuffledOptions.forEach((item, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'quiz-btn';
+                btn.dataset.correct = item.isCorrect;
                 btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}.</strong>&nbsp; ${item.opt}`;
-                btn.onclick = () => handleAnswer(item.isCorrect);
+                btn.onclick = () => handleAnswer(item.isCorrect, btn);
                 optionsContainer.appendChild(btn);
             });
 
             document.getElementById('quiz-modal').style.display = 'flex';
         }
 
-        function handleAnswer(isCorrect) {
+        function handleAnswer(isCorrect, selectedBtn) {
             const feedback = document.getElementById('quiz-feedback');
-            
             const optionBtns = document.querySelectorAll('.quiz-btn');
-            optionBtns.forEach(btn => btn.disabled = true);
+
+            optionBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === "true") {
+                    btn.classList.add('correct-ans');
+                }
+            });
+
+            if (!isCorrect && selectedBtn) {
+                selectedBtn.classList.add('wrong-ans');
+            }
 
             activeTarget.active = false;
+            feedback.style.display = 'inline-block';
 
             if (isCorrect) {
                 feedback.className = 'feedback-msg feedback-success';
-                feedback.innerText = '✓ ตอบถูกต้อง!';
+                feedback.innerHTML = '🎉 ตอบถูกต้อง! (+1 คะแนน)';
                 ballsPassed++;
             } else {
                 feedback.className = 'feedback-msg feedback-error';
-                feedback.innerText = '❌ ตอบผิด!';
+                feedback.innerHTML = '❌ ตอบผิด!';
             }
 
             setTimeout(() => {
@@ -1062,7 +1149,7 @@
                 if (remainingBalls === 0) {
                     finishGame();
                 }
-            }, 900);
+            }, 1400);
         }
 
         function finishGame() {
