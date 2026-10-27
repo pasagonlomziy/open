@@ -119,70 +119,76 @@
             color: #f8fafc;
             font-family: 'Kanit', sans-serif;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
+        /* 🖼️ แก้ไขปัญหาภาพยืดเบี้ยวด้วยการล็อกสัดส่วน Aspect Ratio 5:4 */
         #game-container {
             position: relative;
             width: 100vw;
+            height: calc(100vw * 0.8);
             max-width: 800px;
-            height: 100vh;
             max-height: 600px;
+            aspect-ratio: 5 / 4;
             background: #020617;
-            border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(249, 115, 22, 0.35);
-            border: 3px solid #f97316;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(249, 115, 22, 0.3);
+            border: 2px solid #f97316;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            margin: auto;
         }
 
-        /* Top HUD Bar Responsive */
+        /* 📱 ปรับ HUD Bar สไตล์ Dark Glassmorphic เรียงสวย ไม่ซ้ำบรรทัด */
         #hud {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
+            top: 8px;
+            left: 8px;
+            right: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 4px;
             z-index: 10;
             pointer-events: none;
-            flex-wrap: wrap;
         }
 
         .hud-badge {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            border: 2px solid #f97316;
-            padding: 5px 10px;
-            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(249, 115, 22, 0.6);
+            padding: 4px 8px;
+            border-radius: 14px;
             font-size: 10px;
-            font-weight: 700;
-            color: #ea580c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            font-weight: 600;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             gap: 4px;
-            font-family: 'Press Start 2P', monospace;
+            white-space: nowrap;
             pointer-events: auto;
+        }
+
+        .hud-name-text {
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .lb-btn-hud {
             cursor: pointer;
-            background: linear-gradient(135deg, #f97316, #f59e0b);
+            background: linear-gradient(135deg, #f97316, #ea580c);
             color: #ffffff;
             border-color: #ffffff;
             transition: all 0.2s;
             text-decoration: none;
         }
         .lb-btn-hud:hover {
-            background: #ea580c;
-            color: #ffffff;
+            background: #c2410c;
         }
 
         canvas {
@@ -190,15 +196,16 @@
             height: 100%;
             display: block;
             object-fit: contain;
+            image-rendering: pixelated;
         }
 
-        /* 📱 Virtual Analog Joystick (ปรับตามอุปกรณ์มือถือ) */
+        /* 🕹️ Virtual Joystick สไตล์โปร่งแสง สบายตา */
         #joystick-container {
             position: absolute;
-            bottom: 16px;
-            left: 16px;
-            width: 140px;
-            height: 140px;
+            bottom: 12px;
+            left: 12px;
+            width: 110px;
+            height: 110px;
             z-index: 30;
             display: flex;
             align-items: center;
@@ -207,14 +214,14 @@
         }
 
         #joystick-base {
-            width: 130px;
-            height: 130px;
-            background: rgba(255, 255, 255, 0.82);
-            border: 4px solid #f97316;
+            width: 100px;
+            height: 100px;
+            background: rgba(15, 23, 42, 0.45);
+            border: 2px solid rgba(249, 115, 22, 0.7);
             border-radius: 50%;
             position: relative;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(249, 115, 22, 0.25);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -222,13 +229,13 @@
         }
 
         #joystick-stick {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             background: radial-gradient(circle at 35% 35%, #fb923c, #ea580c);
-            border: 3px solid #ffffff;
+            border: 2px solid #ffffff;
             border-radius: 50%;
             position: absolute;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             pointer-events: none;
             transform: translate(0px, 0px);
         }
@@ -237,103 +244,93 @@
         .modal-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(15, 23, 42, 0.82);
-            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
             z-index: 50;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 14px;
+            padding: 12px;
         }
 
         .card-box {
             position: relative;
             background: #ffffff;
             border: 3px solid #f97316;
-            border-radius: 20px;
+            border-radius: 18px;
             width: 100%;
-            max-width: 480px;
-            max-height: 85vh;
+            max-width: 440px;
+            max-height: 90vh;
             overflow-y: auto;
-            padding: 24px 18px;
-            box-shadow: 0 20px 50px rgba(249, 115, 22, 0.4), inset 0 0 15px rgba(254, 215, 170, 0.3);
+            padding: 20px 16px;
+            box-shadow: 0 20px 50px rgba(249, 115, 22, 0.4);
             text-align: center;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* 🏆 ปุ่มรูปถ้วยรางวัลมุมขวาบน */
         .top-right-lb-btn {
             position: absolute;
-            top: 12px;
-            right: 12px;
+            top: 10px;
+            right: 10px;
             background: linear-gradient(135deg, #f97316, #f59e0b);
             color: #ffffff;
             border: 2px solid #ffffff;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.35);
             transition: all 0.2s ease;
             z-index: 5;
         }
 
         .top-right-lb-btn:hover {
             transform: scale(1.1) rotate(6deg);
-            background: #ea580c;
-        }
-
-        .top-right-lb-btn:active {
-            transform: scale(0.95);
         }
 
         .modal-title {
             font-family: 'Press Start 2P', monospace;
-            font-size: 14px;
+            font-size: 13px;
             color: #ea580c;
-            margin-bottom: 6px;
-            text-shadow: 0 2px 4px rgba(234, 88, 12, 0.15);
+            margin-bottom: 4px;
             line-height: 1.4;
-            padding-right: 36px;
+            padding-right: 30px;
         }
 
         .start-subtext {
             color: #64748b;
-            font-size: 12px;
-            margin-bottom: 16px;
+            font-size: 11px;
+            margin-bottom: 14px;
             font-weight: 500;
         }
 
-        /* Player Profile Box Responsive */
         .player-profile-card {
             background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-            border: 2px solid #fed7aa;
-            border-radius: 14px;
-            padding: 12px 14px;
+            border: 1.5px solid #fed7aa;
+            border-radius: 12px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
+            gap: 10px;
+            margin-bottom: 10px;
             text-align: left;
         }
 
         .profile-avatar {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             background: linear-gradient(135deg, #f97316, #ea580c);
             color: #ffffff;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
+            font-size: 18px;
             flex-shrink: 0;
         }
 
@@ -349,7 +346,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2px;
         }
 
         .lock-tag {
@@ -357,13 +353,12 @@
             background: #ffedd5;
             color: #c2410c;
             border: 1px solid #fdba74;
-            padding: 1px 6px;
-            border-radius: 8px;
-            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 6px;
         }
 
         .profile-name-val {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: #1e293b;
             white-space: nowrap;
@@ -375,7 +370,6 @@
             font-size: 11px;
             color: #ea580c;
             font-weight: 600;
-            margin-top: 1px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -385,17 +379,17 @@
             color: #dc2626;
             background: #fef2f2;
             border: 1px dashed #fca5a5;
-            padding: 8px 10px;
-            border-radius: 10px;
+            padding: 6px 10px;
+            border-radius: 8px;
             font-size: 11px;
             font-weight: 600;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             display: none;
         }
 
         .btn-group {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -404,127 +398,80 @@
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: #ffffff;
             border: 2px solid #ffffff;
-            padding: 9px 16px;
-            border-radius: 26px;
-            font-size: 13px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 700;
             font-family: 'Kanit', sans-serif;
             cursor: pointer;
-            box-shadow: 0 4px 0 #9a3412, 0 6px 12px rgba(249, 115, 22, 0.25);
+            box-shadow: 0 3px 0 #9a3412;
             transition: all 0.15s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #9a3412, 0 8px 16px rgba(249, 115, 22, 0.35);
+            gap: 4px;
         }
 
         .action-btn:active:not(:disabled) {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #9a3412;
-        }
-
-        .action-btn:disabled {
-            background: #cbd5e1 !important;
-            border-color: #f1f5f9 !important;
-            color: #64748b !important;
-            box-shadow: 0 4px 0 #94a3b8 !important;
-            cursor: not-allowed !important;
-            opacity: 0.75;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #9a3412;
         }
 
         .secondary-btn {
             background: #ffffff;
             color: #475569;
-            border: 2px solid #cbd5e1;
-            box-shadow: 0 4px 0 #94a3b8;
+            border: 1.5px solid #cbd5e1;
+            box-shadow: 0 3px 0 #94a3b8;
         }
 
-        .secondary-btn:hover {
-            background: #f8fafc;
-            color: #1e293b;
-            box-shadow: 0 6px 0 #94a3b8;
-        }
-
-        .secondary-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #94a3b8;
-        }
-
-        /* Admin Password Input Field Style */
         .admin-input {
             width: 100%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            border: 2px solid #fed7aa;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1.5px solid #fed7aa;
             background: #fff7ed;
-            font-size: 14px;
+            font-size: 13px;
             font-family: 'Kanit', sans-serif;
             font-weight: 600;
             color: #1e293b;
             text-align: center;
             outline: none;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            user-select: text;
-            -webkit-user-select: text;
         }
 
-        .admin-input:focus {
-            border-color: #f97316;
-            background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
-        }
-
-        /* Quiz Options UI */
         .quiz-question {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             line-height: 1.4;
         }
 
         .quiz-options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
         }
 
         .quiz-btn {
             background: #ffffff;
-            border: 2px solid #fed7aa;
+            border: 1.5px solid #fed7aa;
             color: #334155;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12px;
             font-family: 'Kanit', sans-serif;
             font-weight: 600;
             text-align: left;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-            transition: all 0.15s;
         }
 
-        .quiz-btn:hover { background: #fff7ed; border-color: #f97316; color: #ea580c; }
-        .quiz-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .feedback-msg { margin-top: 10px; font-size: 13px; font-weight: 700; min-height: 18px; }
-        .feedback-error { color: #dc2626; }
-        .feedback-success { color: #16a34a; }
-
-        /* Leaderboard Table Responsive */
         .lb-container {
-            max-height: 180px;
+            max-height: 160px;
             overflow-y: auto;
-            margin-top: 10px;
-            border-radius: 10px;
-            border: 2px solid #fed7aa;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1.5px solid #fed7aa;
             background: #ffffff;
             -webkit-overflow-scrolling: touch;
         }
@@ -532,11 +479,11 @@
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .leaderboard-table th, .leaderboard-table td {
-            padding: 6px 8px;
+            padding: 5px 6px;
             border-bottom: 1px solid #ffedd5;
             text-align: center;
         }
@@ -544,52 +491,9 @@
         .leaderboard-table th { 
             background: #fff7ed; 
             color: #ea580c; 
-            font-family: 'Press Start 2P', monospace; 
             font-size: 8px; 
             position: sticky;
             top: 0;
-        }
-
-        /* 📱 Mobile Specific Media Queries (< 600px) */
-        @media (max-width: 600px) {
-            #game-container {
-                border-radius: 0;
-                border: none;
-            }
-            #hud {
-                top: 8px;
-                left: 6px;
-                right: 6px;
-            }
-            .hud-badge {
-                font-size: 8px;
-                padding: 4px 7px;
-                border-width: 1px;
-            }
-            #joystick-container {
-                width: 120px;
-                height: 120px;
-                bottom: 10px;
-                left: 10px;
-            }
-            #joystick-base {
-                width: 110px;
-                height: 110px;
-                border-width: 3px;
-            }
-            #joystick-stick {
-                width: 46px;
-                height: 46px;
-            }
-            .card-box {
-                padding: 18px 14px;
-                border-width: 2px;
-                border-radius: 16px;
-            }
-            .action-btn {
-                padding: 8px 14px;
-                font-size: 12px;
-            }
         }
     </style>
 </head>
@@ -599,9 +503,9 @@
         <!-- HUD Bar -->
         <div id="hud">
             <a href="index.html" class="hud-badge lb-btn-hud">🏠 หน้าหลัก</a>
-            <div class="hud-badge" id="player-disp-name">ผู้เล่น</div>
-            <div class="hud-badge" id="timer-disp">00:00</div>
-            <div class="hud-badge" id="keys-text">⚽0/10</div>
+            <div class="hud-badge">👤 <span class="hud-name-text" id="player-disp-name">ผู้เล่น</span></div>
+            <div class="hud-badge" id="timer-disp">⏱️ 00:00</div>
+            <div class="hud-badge" id="keys-text">⚽ 0/10</div>
             <div class="hud-badge lb-btn-hud" onclick="openLBModal()">🏆 อันดับ</div>
         </div>
 
@@ -618,9 +522,7 @@
         <!-- Start Screen Modal -->
         <div class="modal-overlay" id="start-modal">
             <div class="card-box">
-                <!-- 🏆 ปุ่มถ้วยรางวัลมุมขวาบน -->
                 <button class="top-right-lb-btn" onclick="openLBModal()" title="ดูอันดับคะแนน">🏆</button>
-
                 <div class="modal-title">OPEN HOUSE IT QUEST</div>
                 <p class="start-subtext">ภารกิจสะสมคะแนนสายคอมพิวเตอร์</p>
                 
@@ -648,14 +550,14 @@
             </div>
         </div>
 
-        <!-- Custom Admin Password Modal -->
+        <!-- Admin Password Modal -->
         <div class="modal-overlay" id="admin-modal" style="display: none;">
-            <div class="card-box" style="max-width: 380px;">
-                <div class="modal-title" style="font-size: 13px; padding-right: 0;">🔒 สิทธิ์ผู้ดูแลระบบ</div>
-                <p class="start-subtext" style="margin-bottom: 12px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่หน้าผู้ดูแล</p>
+            <div class="card-box" style="max-width: 340px;">
+                <div class="modal-title" style="font-size: 12px; padding-right: 0;">🔒 สิทธิ์ผู้ดูแลระบบ</div>
+                <p class="start-subtext" style="margin-bottom: 10px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่หน้าผู้ดูแล</p>
                 
                 <input type="password" id="admin-pass-input" class="admin-input" placeholder="พิมพ์รหัสผ่านที่นี่..." onkeydown="handleAdminInputKey(event)" autocomplete="off">
-                <div class="feedback-msg feedback-error" id="admin-pass-error" style="min-height: 20px; margin-top: 6px; margin-bottom: 10px; font-size: 12px;"></div>
+                <div class="feedback-msg feedback-error" id="admin-pass-error" style="min-height: 18px; margin-top: 4px; margin-bottom: 8px; font-size: 11px;"></div>
 
                 <div class="btn-group">
                     <button class="action-btn" onclick="checkAdminPassword()">เข้าสู่ระบบ</button>
@@ -667,8 +569,8 @@
         <!-- Standalone Leaderboard Modal -->
         <div class="modal-overlay" id="lb-view-modal" style="display: none;">
             <div class="card-box">
-                <div class="modal-title" style="color: #ea580c; font-size: 13px; padding-right: 0;">LEADERBOARD 🏆</div>
-                <p style="color: #64748b; font-size: 12px; margin-bottom: 4px; font-weight: 500;">อันดับสถิติสะสมของผู้เล่นทั้งหมด (Cloud)</p>
+                <div class="modal-title" style="color: #ea580c; font-size: 12px; padding-right: 0;">LEADERBOARD 🏆</div>
+                <p style="color: #64748b; font-size: 11px; margin-bottom: 4px; font-weight: 500;">อันดับสถิติสะสมของผู้เล่นทั้งหมด (Cloud)</p>
                 
                 <div class="lb-container">
                     <table class="leaderboard-table">
@@ -701,10 +603,10 @@
         <!-- Victory Modal -->
         <div class="modal-overlay" id="win-modal" style="display: none;">
             <div class="card-box">
-                <div class="modal-title" style="color: #16a34a; font-size: 14px; padding-right: 0;">MISSION COMPLETED! 🏆</div>
-                <p id="win-summary" style="font-size: 13px; margin-bottom: 8px; color: #1e293b; font-weight: 600;"></p>
+                <div class="modal-title" style="color: #16a34a; font-size: 13px; padding-right: 0;">MISSION COMPLETED! 🏆</div>
+                <p id="win-summary" style="font-size: 12px; margin-bottom: 6px; color: #1e293b; font-weight: 600;"></p>
                 
-                <h3 style="color: #ea580c; font-size: 10px; margin-top: 8px; margin-bottom: 4px; font-family: 'Press Start 2P', monospace;">LEADERBOARD (อันดับสะสม)</h3>
+                <h3 style="color: #ea580c; font-size: 9px; margin-top: 6px; margin-bottom: 4px; font-family: 'Press Start 2P', monospace;">LEADERBOARD (อันดับสะสม)</h3>
                 <div class="lb-container">
                     <table class="leaderboard-table">
                         <thead>
@@ -719,7 +621,7 @@
                     </table>
                 </div>
                 <br>
-                <div style="display: flex; gap: 8px; justify-content: center;">
+                <div style="display: flex; gap: 6px; justify-content: center;">
                     <a href="index.html" class="action-btn">🏠 กลับหน้าหลัก</a>
                 </div>
             </div>
@@ -816,6 +718,9 @@
 
             const dispName = document.getElementById('disp-player-name');
             if (dispName) dispName.innerText = playerName;
+
+            const dispPlayerHud = document.getElementById('player-disp-name');
+            if (dispPlayerHud) dispPlayerHud.innerText = playerName;
 
             const dispSchool = document.getElementById('disp-player-school');
             if (dispSchool) {
@@ -915,7 +820,7 @@
         let isGameStarted = false;
         let isLBModalOpen = false;
 
-        // ================= VIRTUAL JOYSTICK (คำนวณ Dynamic Radius สำหรับมือถือ) =================
+        // ================= VIRTUAL JOYSTICK =================
         let joystickVector = { x: 0, y: 0 };
         let isJoystickActive = false;
         const joystickBase = document.getElementById('joystick-base');
@@ -943,7 +848,7 @@
             const rect = joystickBase.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            const maxRadius = (rect.width / 2) - 14;
+            const maxRadius = (rect.width / 2) - 10;
 
             let deltaX = clientX - centerX;
             let deltaY = clientY - centerY;
@@ -1031,7 +936,7 @@
         function updateTimer() {
             if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
             elapsedTimeInSec = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timer-disp').innerText = formatTimeStr(elapsedTimeInSec);
+            document.getElementById('timer-disp').innerText = `⏱️ ${formatTimeStr(elapsedTimeInSec)}`;
         }
 
         // ================= PLAYER MOVEMENT & COLLISION =================
@@ -1148,7 +1053,7 @@
             }
 
             setTimeout(() => {
-                document.getElementById('keys-text').innerText = `⚽${ballsPassed}/10`;
+                document.getElementById('keys-text').innerText = `⚽ ${ballsPassed}/10`;
                 document.getElementById('quiz-modal').style.display = 'none';
                 resetKeys();
                 isQuizOpen = false;
@@ -1162,8 +1067,6 @@
 
         function finishGame() {
             clearInterval(timerInterval);
-            
-            // 🔒 บันทึกสถานะว่าผู้เล่นเครื่องนี้เล่นเกมจบแล้ว (ห้ามเล่นซ้ำ)
             localStorage.setItem("cpe_quiz_played", "true");
 
             document.getElementById('win-summary').innerText = `คุณ ${playerName} ทำคะแนนได้ ${ballsPassed}/10 ข้อ | เวลา ${formatTimeStr(elapsedTimeInSec)}`;
