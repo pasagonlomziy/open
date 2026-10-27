@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Open House IT Quest - Online Leaderboard Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -109,9 +109,12 @@
             -webkit-user-select: none;
             touch-action: manipulation;
         }
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
+            overflow: hidden;
             background-color: #020617;
             color: #f8fafc;
             font-family: 'Kanit', sans-serif;
@@ -119,8 +122,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
         }
 
         #game-container {
@@ -138,34 +139,37 @@
             flex-direction: column;
         }
 
-        /* Top HUD Bar */
+        /* Top HUD Bar Responsive */
         #hud {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            right: 12px;
+            top: 10px;
+            left: 10px;
+            right: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 4px;
             z-index: 10;
             pointer-events: none;
+            flex-wrap: wrap;
         }
 
         .hud-badge {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
             border: 2px solid #f97316;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: #ea580c;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             font-family: 'Press Start 2P', monospace;
             pointer-events: auto;
+            white-space: nowrap;
         }
 
         .lb-btn-hud {
@@ -185,15 +189,16 @@
             width: 100%;
             height: 100%;
             display: block;
+            object-fit: contain;
         }
 
-        /* 📱 Virtual Analog Joystick UI (ปรับขยายขนาดใหม่กดง่าย ถนัดมือ) */
+        /* 📱 Virtual Analog Joystick (ปรับตามอุปกรณ์มือถือ) */
         #joystick-container {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 160px;
-            height: 160px;
+            bottom: 16px;
+            left: 16px;
+            width: 140px;
+            height: 140px;
             z-index: 30;
             display: flex;
             align-items: center;
@@ -202,14 +207,14 @@
         }
 
         #joystick-base {
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.78);
+            width: 130px;
+            height: 130px;
+            background: rgba(255, 255, 255, 0.82);
             border: 4px solid #f97316;
             border-radius: 50%;
             position: relative;
             backdrop-filter: blur(8px);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(249, 115, 22, 0.25);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(249, 115, 22, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -217,82 +222,117 @@
         }
 
         #joystick-stick {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             background: radial-gradient(circle at 35% 35%, #fb923c, #ea580c);
             border: 3px solid #ffffff;
             border-radius: 50%;
             position: absolute;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
             pointer-events: none;
             transform: translate(0px, 0px);
         }
 
-        /* Modal Overlays */
+        /* Modal Overlays Responsive */
         .modal-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(15, 23, 42, 0.78);
+            background: rgba(15, 23, 42, 0.82);
             backdrop-filter: blur(12px);
             z-index: 50;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 14px;
         }
 
         .card-box {
+            position: relative;
             background: #ffffff;
             border: 3px solid #f97316;
-            border-radius: 24px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 500px;
-            padding: 28px 24px;
+            max-width: 480px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px 18px;
             box-shadow: 0 20px 50px rgba(249, 115, 22, 0.4), inset 0 0 15px rgba(254, 215, 170, 0.3);
             text-align: center;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 🏆 ปุ่มรูปถ้วยรางวัลมุมขวาบน */
+        .top-right-lb-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+            transition: all 0.2s ease;
+            z-index: 5;
+        }
+
+        .top-right-lb-btn:hover {
+            transform: scale(1.1) rotate(6deg);
+            background: #ea580c;
+        }
+
+        .top-right-lb-btn:active {
+            transform: scale(0.95);
         }
 
         .modal-title {
             font-family: 'Press Start 2P', monospace;
-            font-size: 16px;
+            font-size: 14px;
             color: #ea580c;
             margin-bottom: 6px;
             text-shadow: 0 2px 4px rgba(234, 88, 12, 0.15);
             line-height: 1.4;
+            padding-right: 36px;
         }
 
         .start-subtext {
             color: #64748b;
-            font-size: 13px;
-            margin-bottom: 20px;
+            font-size: 12px;
+            margin-bottom: 16px;
             font-weight: 500;
         }
 
-        /* Player Profile Box */
+        /* Player Profile Box Responsive */
         .player-profile-card {
             background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
             border: 2px solid #fed7aa;
-            border-radius: 16px;
-            padding: 14px 18px;
+            border-radius: 14px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 14px;
+            gap: 12px;
+            margin-bottom: 12px;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
             text-align: left;
         }
 
         .profile-avatar {
-            width: 46px;
-            height: 46px;
+            width: 42px;
+            height: 42px;
             background: linear-gradient(135deg, #f97316, #ea580c);
             color: #ffffff;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
             flex-shrink: 0;
         }
@@ -303,7 +343,7 @@
         }
 
         .profile-name-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #9a3412;
             font-weight: 700;
             display: flex;
@@ -313,7 +353,7 @@
         }
 
         .lock-tag {
-            font-size: 10px;
+            font-size: 9px;
             background: #ffedd5;
             color: #c2410c;
             border: 1px solid #fdba74;
@@ -323,7 +363,7 @@
         }
 
         .profile-name-val {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: #1e293b;
             white-space: nowrap;
@@ -332,7 +372,7 @@
         }
 
         .profile-school-val {
-            font-size: 12px;
+            font-size: 11px;
             color: #ea580c;
             font-weight: 600;
             margin-top: 1px;
@@ -341,22 +381,21 @@
             text-overflow: ellipsis;
         }
 
-        /* Alert message for played users */
         .already-played-warning {
             color: #dc2626;
             background: #fef2f2;
             border: 1px dashed #fca5a5;
-            padding: 8px 12px;
+            padding: 8px 10px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             display: none;
         }
 
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -365,9 +404,9 @@
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: #ffffff;
             border: 2px solid #ffffff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 14px;
+            padding: 9px 16px;
+            border-radius: 26px;
+            font-size: 13px;
             font-weight: 700;
             font-family: 'Kanit', sans-serif;
             cursor: pointer;
@@ -376,7 +415,7 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .action-btn:hover:not(:disabled) {
@@ -419,11 +458,11 @@
         /* Admin Password Input Field Style */
         .admin-input {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 14px;
+            padding: 10px 14px;
+            border-radius: 12px;
             border: 2px solid #fed7aa;
             background: #fff7ed;
-            font-size: 15px;
+            font-size: 14px;
             font-family: 'Kanit', sans-serif;
             font-weight: 600;
             color: #1e293b;
@@ -443,17 +482,17 @@
 
         /* Quiz Options UI */
         .quiz-question {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             line-height: 1.4;
         }
 
         .quiz-options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
@@ -461,9 +500,9 @@
             background: #ffffff;
             border: 2px solid #fed7aa;
             color: #334155;
-            padding: 12px 14px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
             font-family: 'Kanit', sans-serif;
             font-weight: 600;
             text-align: left;
@@ -475,28 +514,29 @@
         .quiz-btn:hover { background: #fff7ed; border-color: #f97316; color: #ea580c; }
         .quiz-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .feedback-msg { margin-top: 12px; font-size: 14px; font-weight: 700; min-height: 20px; }
+        .feedback-msg { margin-top: 10px; font-size: 13px; font-weight: 700; min-height: 18px; }
         .feedback-error { color: #dc2626; }
         .feedback-success { color: #16a34a; }
 
-        /* Leaderboard Table */
+        /* Leaderboard Table Responsive */
         .lb-container {
-            max-height: 220px;
+            max-height: 180px;
             overflow-y: auto;
-            margin-top: 12px;
-            border-radius: 12px;
+            margin-top: 10px;
+            border-radius: 10px;
             border: 2px solid #fed7aa;
             background: #ffffff;
+            -webkit-overflow-scrolling: touch;
         }
 
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .leaderboard-table th, .leaderboard-table td {
-            padding: 8px 10px;
+            padding: 6px 8px;
             border-bottom: 1px solid #ffedd5;
             text-align: center;
         }
@@ -505,9 +545,51 @@
             background: #fff7ed; 
             color: #ea580c; 
             font-family: 'Press Start 2P', monospace; 
-            font-size: 9px; 
+            font-size: 8px; 
             position: sticky;
             top: 0;
+        }
+
+        /* 📱 Mobile Specific Media Queries (< 600px) */
+        @media (max-width: 600px) {
+            #game-container {
+                border-radius: 0;
+                border: none;
+            }
+            #hud {
+                top: 8px;
+                left: 6px;
+                right: 6px;
+            }
+            .hud-badge {
+                font-size: 8px;
+                padding: 4px 7px;
+                border-width: 1px;
+            }
+            #joystick-container {
+                width: 120px;
+                height: 120px;
+                bottom: 10px;
+                left: 10px;
+            }
+            #joystick-base {
+                width: 110px;
+                height: 110px;
+                border-width: 3px;
+            }
+            #joystick-stick {
+                width: 46px;
+                height: 46px;
+            }
+            .card-box {
+                padding: 18px 14px;
+                border-width: 2px;
+                border-radius: 16px;
+            }
+            .action-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -536,6 +618,9 @@
         <!-- Start Screen Modal -->
         <div class="modal-overlay" id="start-modal">
             <div class="card-box">
+                <!-- 🏆 ปุ่มถ้วยรางวัลมุมขวาบน -->
+                <button class="top-right-lb-btn" onclick="openLBModal()" title="ดูอันดับคะแนน">🏆</button>
+
                 <div class="modal-title">OPEN HOUSE IT QUEST</div>
                 <p class="start-subtext">ภารกิจสะสมคะแนนสายคอมพิวเตอร์</p>
                 
@@ -566,11 +651,11 @@
         <!-- Custom Admin Password Modal -->
         <div class="modal-overlay" id="admin-modal" style="display: none;">
             <div class="card-box" style="max-width: 380px;">
-                <div class="modal-title" style="font-size: 14px;">🔒 สิทธิ์ผู้ดูแลระบบ</div>
-                <p class="start-subtext" style="margin-bottom: 14px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่หน้าผู้ดูแล</p>
+                <div class="modal-title" style="font-size: 13px; padding-right: 0;">🔒 สิทธิ์ผู้ดูแลระบบ</div>
+                <p class="start-subtext" style="margin-bottom: 12px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่หน้าผู้ดูแล</p>
                 
                 <input type="password" id="admin-pass-input" class="admin-input" placeholder="พิมพ์รหัสผ่านที่นี่..." onkeydown="handleAdminInputKey(event)" autocomplete="off">
-                <div class="feedback-msg feedback-error" id="admin-pass-error" style="min-height: 22px; margin-top: 6px; margin-bottom: 12px; font-size: 13px;"></div>
+                <div class="feedback-msg feedback-error" id="admin-pass-error" style="min-height: 20px; margin-top: 6px; margin-bottom: 10px; font-size: 12px;"></div>
 
                 <div class="btn-group">
                     <button class="action-btn" onclick="checkAdminPassword()">เข้าสู่ระบบ</button>
@@ -582,8 +667,8 @@
         <!-- Standalone Leaderboard Modal -->
         <div class="modal-overlay" id="lb-view-modal" style="display: none;">
             <div class="card-box">
-                <div class="modal-title" style="color: #ea580c; font-size: 14px;">LEADERBOARD 🏆</div>
-                <p style="color: #64748b; font-size: 13px; margin-bottom: 5px; font-weight: 500;">อันดับสถิติสะสมของผู้เล่นทั้งหมด (Cloud)</p>
+                <div class="modal-title" style="color: #ea580c; font-size: 13px; padding-right: 0;">LEADERBOARD 🏆</div>
+                <p style="color: #64748b; font-size: 12px; margin-bottom: 4px; font-weight: 500;">อันดับสถิติสะสมของผู้เล่นทั้งหมด (Cloud)</p>
                 
                 <div class="lb-container">
                     <table class="leaderboard-table">
@@ -606,7 +691,7 @@
         <!-- Quiz Mission Modal -->
         <div class="modal-overlay" id="quiz-modal" style="display: none;">
             <div class="card-box">
-                <div class="modal-title" id="quiz-gate-num" style="font-size: 11px;">MISSION #1</div>
+                <div class="modal-title" id="quiz-gate-num" style="font-size: 11px; padding-right: 0;">MISSION #1</div>
                 <div class="quiz-question" id="quiz-question">คำถามคอมพิวเตอร์...</div>
                 <div class="quiz-options" id="quiz-options"></div>
                 <div class="feedback-msg" id="quiz-feedback"></div>
@@ -616,10 +701,10 @@
         <!-- Victory Modal -->
         <div class="modal-overlay" id="win-modal" style="display: none;">
             <div class="card-box">
-                <div class="modal-title" style="color: #16a34a; font-size: 15px;">MISSION COMPLETED! 🏆</div>
-                <p id="win-summary" style="font-size: 15px; margin-bottom: 10px; color: #1e293b; font-weight: 600;"></p>
+                <div class="modal-title" style="color: #16a34a; font-size: 14px; padding-right: 0;">MISSION COMPLETED! 🏆</div>
+                <p id="win-summary" style="font-size: 13px; margin-bottom: 8px; color: #1e293b; font-weight: 600;"></p>
                 
-                <h3 style="color: #ea580c; font-size: 11px; margin-top: 10px; margin-bottom: 5px; font-family: 'Press Start 2P', monospace;">LEADERBOARD (อันดับสะสม)</h3>
+                <h3 style="color: #ea580c; font-size: 10px; margin-top: 8px; margin-bottom: 4px; font-family: 'Press Start 2P', monospace;">LEADERBOARD (อันดับสะสม)</h3>
                 <div class="lb-container">
                     <table class="leaderboard-table">
                         <thead>
@@ -830,13 +915,12 @@
         let isGameStarted = false;
         let isLBModalOpen = false;
 
-        // ================= VIRTUAL JOYSTICK (ปรับสเกลตามขนาดใหม่) =================
+        // ================= VIRTUAL JOYSTICK (คำนวณ Dynamic Radius สำหรับมือถือ) =================
         let joystickVector = { x: 0, y: 0 };
         let isJoystickActive = false;
         const joystickBase = document.getElementById('joystick-base');
         const joystickStick = document.getElementById('joystick-stick');
         const joystickContainer = document.getElementById('joystick-container');
-        const maxJoystickRadius = 50; // ปรับเพิ่มรัศมีการลากให้สมดุลกับขนาด 150px
 
         function handleJoystickStart(clientX, clientY) {
             if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
@@ -859,20 +943,21 @@
             const rect = joystickBase.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
+            const maxRadius = (rect.width / 2) - 14;
 
             let deltaX = clientX - centerX;
             let deltaY = clientY - centerY;
             let distance = Math.hypot(deltaX, deltaY);
 
-            if (distance > maxJoystickRadius) {
+            if (distance > maxRadius) {
                 const angle = Math.atan2(deltaY, deltaX);
-                deltaX = Math.cos(angle) * maxJoystickRadius;
-                deltaY = Math.sin(angle) * maxJoystickRadius;
+                deltaX = Math.cos(angle) * maxRadius;
+                deltaY = Math.sin(angle) * maxRadius;
             }
 
             joystickStick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            joystickVector.x = deltaX / maxJoystickRadius;
-            joystickVector.y = deltaY / maxJoystickRadius;
+            joystickVector.x = deltaX / maxRadius;
+            joystickVector.y = deltaY / maxRadius;
         }
 
         joystickContainer.addEventListener('touchstart', e => {
