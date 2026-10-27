@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายชื่อและคะแนนแบบทดสอบ - CPE Open House Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase Cloud SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxRlfiL80TUoeyQDk93PQ5A0W3e37PoSI",
+            authDomain: "elon-musk-c6fa9.firebaseapp.com",
+            projectId: "elon-musk-c6fa9",
+            storageBucket: "elon-musk-c6fa9.firebasestorage.app",
+            messagingSenderId: "609890115150",
+            appId: "1:609890115150:web:428937710422523698ed1f",
+            measurementId: "G-WTHXDEWJMR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 🗑️ ฟังก์ชันลบข้อมูลรายชื่อเดี่ยว
+        window.deleteSingleScore = async function(docId, personName) {
+            if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ "${personName}" ?`)) return;
+            
+            try {
+                await deleteDoc(doc(db, "leaderboard", docId));
+                alert(`✅ ลบข้อมูลของ "${personName}" เรียบร้อยแล้ว!`);
+                loadQuizScoreData();
+            } catch (error) {
+                console.error("Error deleting document:", error);
+                alert("❌ เกิดข้อผิดพลาดในการลบ: " + error.message);
+            }
+        };
+
+        async function loadQuizScoreData() {
+            const tbody = document.getElementById("data-table-body");
+            const countEl = document.getElementById("user-count");
+            tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-400">กำลังดึงข้อมูลคะแนนจาก Cloud...</td></tr>';
+
+            try {
+                const q = query(collection(db, "leaderboard"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                tbody.innerHTML = "";
+                countEl.innerText = querySnapshot.size;
+
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลการทำแบบทดสอบ</td></tr>';
+                    return;
+                }
+
+                let index = 1;
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const docId = docSnap.id;
+                    const personName = data.name || '-';
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-orange-50/50 transition-colors border-b border-slate-100 text-xs sm:text-sm";
+                    
+                    const correctTotal = data.correctTotal !== undefined ? data.correctTotal : (data.score ? Math.floor(data.score / 100) : 0);
+                    const easy = data.easyCorrect !== undefined ? data.easyCorrect : "-";
+                    const medium = data.mediumCorrect !== undefined ? data.mediumCorrect : "-";
+                    const hard = data.hardCorrect !== undefined ? data.hardCorrect : "-";
+
+                    tr.innerHTML = `
+                        <td class="p-3 text-center font-bold text-slate-400">${index++}</td>
+                        <td class="p-3 font-bold text-slate-800">${personName}</td>
+                        <td class="p-3 text-slate-600 font-medium">${data.school || '-'}</td>
+                        <td class="p-3 text-right font-black text-orange-600">${Number(data.score || 0).toLocaleString()} คะแนน</td>
+                        <td class="p-3 text-center font-bold text-emerald-600 bg-emerald-50/50 rounded-lg">${correctTotal}/10 ข้อ</td>
+                        <td class="p-3 text-xs">
+                            <div class="flex flex-wrap gap-1.5 justify-center">
+                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">🟢 ถูกสะสม: ${correctTotal}/10</span>
+                                ${data.time ? `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold">⏱️ เวลา: ${data.time} วิ</span>` : ''}
+                            </div>
+                        </td>
+                        <td class="p-3 text-slate-400 text-xs text-center">${data.date || '-'}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteSingleScore('${docId}', '${String(personName).replace(/'/g, "\\'")}')" 
+                                    class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-2.5 py-1 rounded-lg text-xs shadow-sm active:scale-95 transition cursor-pointer">
+                                🗑️ ลบ
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error loading quiz scores:", error);
+                tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-red-500">เกิดข้อผิดพลาดในการโหลดข้อมูลคะแนน</td></tr>';
+            }
+        }
+
+        window.loadQuizScoreData = loadQuizScoreData;
+        window.addEventListener("DOMContentLoaded", loadQuizScoreData);
+    </script>
+</head>
+<body class="font-sans bg-slate-50 min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div>
+                <span class="text-xs font-bold text-orange-600 uppercase tracking-widest">Admin Data Center</span>
+                <h1 class="text-2xl font-black text-slate-800">📋 รายชื่อและรายละเอียดคะแนนผู้ทำแบบทดสอบ</h1>
+                <p class="text-xs text-slate-500 mt-1">จำนวนผู้เข้าทำแบบทดสอบทั้งหมด: <span id="user-count" class="font-bold text-orange-600 text-sm">0</span> คน</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="loadQuizScoreData()" class="px-4 py-2 rounded-xl bg-orange-100 text-orange-700 font-bold text-xs hover:bg-orange-200 active:scale-95 transition cursor-pointer">
+                    🔄 รีเฟรชข้อมูล
+                </button>
+                <a href="resetboard.html" class="px-4 py-2 rounded-xl border-2 border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100 transition">
+                    ← กลับผู้ดูแลระบบ
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-100 text-slate-700 font-bold text-xs uppercase border-b border-slate-200">
+                        <tr>
+                            <th class="p-3 text-center w-12">ลำดับ</th>
+                            <th class="p-3">ชื่อ - นามสกุล</th>
+                            <th class="p-3">สังกัด</th>
+                            <th class="p-3 text-right">คะแนนรวม</th>
+                            <th class="p-3 text-center">ตอบถูกรวม</th>
+                            <th class="p-3 text-center">รายละเอียด</th>
+                            <th class="p-3 text-center">วันที่ทำรายการ</th>
+                            <th class="p-3 text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body" class="divide-y divide-slate-100">
+                        <!-- Data rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบผู้ดูแล - CPE Open House Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxRlfiL80TUoeyQDk93PQ5A0W3e37PoSI",
+            authDomain: "elon-musk-c6fa9.firebaseapp.com",
+            projectId: "elon-musk-c6fa9",
+            storageBucket: "elon-musk-c6fa9.firebasestorage.app",
+            messagingSenderId: "609890115150",
+            appId: "1:609890115150:web:428937710422523698ed1f",
+            measurementId: "G-WTHXDEWJMR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function clearLocalQuizData() {
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith("cpe_quiz_played_") || key.startsWith("cpe_quiz_result_") || key.startsWith("cpe_quiz_lb_stack")) {
+                    localStorage.removeItem(key);
+                }
+            });
+        }
+
+        window.resetLocalPlayStatus = function() {
+            clearLocalQuizData();
+            alert("🔓 ปลดล็อกสิทธิ์การทำแบบทดสอบเครื่องนี้เรียบร้อย!");
+            window.location.href = "quiz.html";
+        };
+
+        window.resetFirebaseLeaderboard = async function() {
+            if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลคะแนนทั้งหมดในระบบคลาวด์?")) return;
+            try {
+                const querySnapshot = await getDocs(collection(db, "leaderboard"));
+                const deletePromises = [];
+                querySnapshot.forEach((document) => {
+                    deletePromises.push(deleteDoc(doc(db, "leaderboard", document.id)));
+                });
+                await Promise.all(deletePromises);
+                clearLocalQuizData();
+                alert("✅ ล้างกระดานคะแนนเรียบร้อยแล้ว!");
+                window.location.href = "quiz.html";
+            } catch (error) {
+                alert("❌ เกิดข้อผิดพลาด: " + error.message);
+            }
+        };
+
+        window.resetFirebaseUsers = async function() {
+            if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบ Log ผู้เข้าใช้งานทั้งหมด?")) return;
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                const deletePromises = [];
+                querySnapshot.forEach((document) => {
+                    deletePromises.push(deleteDoc(doc(db, "users", document.id)));
+                });
+                await Promise.all(deletePromises);
+                alert("✅ ล้าง Log ผู้ใช้งานเรียบร้อยแล้ว!");
+                location.reload();
+            } catch (error) {
+                alert("❌ เกิดข้อผิดพลาด: " + error.message);
+            }
+        };
+    </script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl max-w-md w-full text-center border-t-8 border-red-500">
+        <h1 class="text-2xl font-black text-slate-800 mb-1">⚙️ ผู้ดูแลระบบ (Admin)</h1>
+        <p class="text-xs text-slate-500 mb-6">ศูนย์ควบคุมและรีเซ็ตข้อมูล CPE Open House</p>
+        
+        <div class="space-y-3">
+            <a href="data.html" class="inline-block w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm">
+                📋 ดู Log รายชื่อและรายละเอียดคะแนน
+            </a>
+
+            <hr class="border-slate-200 my-2">
+
+            <button onclick="resetLocalPlayStatus()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm cursor-pointer">
+                🔓 ปลดล็อกสิทธิ์การทำแบบทดสอบ (เครื่องนี้)
+            </button>
+
+            <button onclick="resetFirebaseLeaderboard()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm cursor-pointer">
+                🏆 ล้างกระดานคะแนนทั้งหมด (Cloud)
+            </button>
+
+            <button onclick="resetFirebaseUsers()" class="w-full bg-rose-800 hover:bg-rose-900 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm cursor-pointer">
+                🗑️ ล้าง Log รายชื่อผู้ใช้งานทั้งหมด (Cloud)
+            </button>
+
+            <hr class="border-slate-200 my-2">
+
+            <div class="grid grid-cols-2 gap-2">
+                <a href="quiz.html" class="inline-block bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 px-3 rounded-xl text-xs">
+                    ← กลับหน้าแบบทดสอบ
+                </a>
+                <a href="index.html" class="inline-block bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-3 rounded-xl text-xs">
+                    🏠 หน้าหลัก
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

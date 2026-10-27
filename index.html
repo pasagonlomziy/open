@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 📱 เปิดให้รองรับการซูมบนมือถือ (user-scalable=yes) -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
+    />
+    <title>CPE Exhibition - แนะนำเกี่ยวกับวิศวะคอมพิวเตอร์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* 📱 ปรับแต่งการสัมผัสและการแสดงผลเฉพาะมือถือ */
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* 🌈 แอนิเมชันไล่เฉดสี Add-on ช่วงใกล้สิ้นสุดเวลา OPEN HOUSE */
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      .near-end-gradient {
+        background: linear-gradient(-45deg, #ff416c, #ff4b2b, #f59e0b, #ef4444) !important;
+        background-size: 300% 300% !important;
+        animation: gradientShift 4s ease infinite !important;
+        color: #ffffff !important;
+        box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4) !important;
+      }
+
+      .near-end-text {
+        color: #ffffff !important;
+      }
+
+      .near-end-subtext {
+        color: #fef08a !important;
+      }
+
+      .pulse-warning {
+        animation: pulseGlow 1.5s infinite alternate;
+      }
+
+      @keyframes pulseGlow {
+        0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)); }
+        100% { transform: scale(1.02); filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)); }
+      }
+
+      /* แอนิเมชันป็อปอัปสไลด์จากด้านล่างแบบ Native App */
+      @keyframes slideUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .animate-slide-up {
+        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      /* ✨ เลื่อนเนื้อหาภายในนุ่มนวลแบบมีแรงเฉื่อย (Smooth Scroll) */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+      }
+    </style>
+  </head>
+  <body
+    class="font-sans antialiased text-slate-800 min-h-screen relative bg-white overflow-x-hidden flex flex-col justify-between pb-20 sm:pb-6"
+  >
+    <!-- 🌴 พื้นหลังสไตล์ Vice City Palm Silhouette ไล่โทนสีส้มสดใสไปขาว -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none">
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-orange-500 via-orange-300 via-orange-100 to-white"
+      ></div>
+
+      <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-72 sm:h-96 bg-gradient-to-b from-amber-300/40 via-orange-200/20 to-transparent blur-3xl pointer-events-none"
+      ></div>
+
+      <!-- 🌴 เงาต้นมะพร้าวสไตล์ Vice City ฝั่งซ้ายและขวา -->
+      <svg class="absolute inset-0 w-full h-full opacity-80 sm:opacity-100" preserveAspectRatio="none" viewBox="0 0 1400 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="palmGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7c2d12" stop-opacity="0.8" />
+            <stop offset="60%" stop-color="#9a3412" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#c2410c" stop-opacity="0.4" />
+          </linearGradient>
+        </defs>
+
+        <g stroke="#9a3412" stroke-opacity="0.4" stroke-width="2" fill="none">
+          <path d="M 680 480 Q 690 472 700 480 Q 710 472 720 480" />
+          <path d="M 710 495 Q 717 489 725 495 Q 732 489 740 495" />
+          <path d="M 650 510 Q 657 505 664 510 Q 671 505 678 510" />
+        </g>
+
+        <!-- กลุ่มต้นมะพร้าวฝั่งซ้าย -->
+        <g fill="url(#palmGradient)">
+          <path d="M -20 800 C 60 550 100 300 130 80 L 150 82 C 120 300 80 550 10 800 Z" />
+          <path d="M 140 80 C 80 10 10 -10 -80 10 C -10 30 50 50 140 80 Z" />
+          <path d="M 140 80 C 200 0 280 -20 350 10 C 270 50 200 65 140 80 Z" />
+          <path d="M 140 80 C 50 80 -40 110 -100 170 C -20 150 60 120 140 80 Z" />
+          <path d="M 140 80 C 220 110 300 140 360 210 C 280 170 200 130 140 80 Z" />
+          <path d="M 140 80 C 110 170 80 260 30 320 C 80 250 120 170 140 80 Z" />
+
+          <path d="M 180 800 C 220 600 240 420 260 220 L 276 222 C 256 420 236 600 198 800 Z" />
+          <path d="M 268 220 C 210 160 140 140 60 160 C 130 180 190 195 268 220 Z" />
+          <path d="M 268 220 C 320 150 400 130 470 150 C 400 180 340 200 268 220 Z" />
+          <path d="M 268 220 C 180 230 90 270 30 330 C 100 300 180 270 268 220 Z" />
+          <path d="M 268 220 C 340 250 420 290 480 360 C 400 320 330 270 268 220 Z" />
+        </g>
+
+        <!-- กลุ่มต้นมะพร้าวฝั่งขวา -->
+        <g fill="url(#palmGradient)">
+          <path d="M 1260 800 C 1230 550 1210 300 1190 60 L 1208 58 C 1228 300 1248 550 1280 800 Z" />
+          <path d="M 1199 59 C 1120 -10 1040 -20 960 10 C 1040 40 1120 50 1199 59 Z" />
+          <path d="M 1199 59 C 1260 -10 1340 -20 1420 10 C 1340 40 1270 50 1199 59 Z" />
+          <path d="M 1199 59 C 1100 70 1000 100 920 160 C 1010 130 1100 100 1199 59 Z" />
+          <path d="M 1199 59 C 1280 90 1360 120 1440 190 C 1360 150 1280 110 1199 59 Z" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- แถบนำทางด้านบน (Navbar) -->
+    <header class="relative z-20 w-full pt-safe">
+      <nav
+        class="flex items-center justify-between px-3.5 py-3 md:px-12 md:py-6 max-w-7xl mx-auto"
+      >
+        <div class="flex items-center bg-white/50 backdrop-blur-md px-3 py-1.5 md:px-5 md:py-2.5 rounded-full border border-white/80 shadow-sm active:scale-95 transition-all">
+          <img
+            src="image/raja333.png"
+            alt="University Logo"
+            class="h-6 sm:h-8 md:h-12 object-contain filter drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]"
+          />
+        </div>
+
+        <div class="flex items-center space-x-2 md:space-x-4">
+          <div id="nav-user-container">
+            <a
+              href="login.html"
+              class="border-2 border-orange-500 rounded-full px-3.5 py-1.5 text-xs md:text-sm font-bold text-orange-600 bg-white/90 hover:bg-orange-500 hover:text-white transition active:scale-95 shadow-sm inline-block"
+            >
+              เข้าสู่ระบบ
+            </a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 🌟 คอนเทนต์ส่วนกลาง (การ์ดนาฬิกา + ปุ่มแอ็กชัน + โบรชัวร์) -->
+    <div class="relative z-10 flex-1 flex flex-col justify-center items-center px-3.5 py-2 sm:py-6 max-w-xl mx-auto w-full space-y-3.5 sm:space-y-6">
+      
+      <!-- 🕒 การ์ดนาฬิกา -->
+      <div class="w-full relative select-none">
+        <div class="absolute -inset-0.5 bg-gradient-to-r from-orange-400/30 via-amber-300/40 to-orange-500/30 rounded-[2rem] sm:rounded-[2.8rem] blur-md sm:blur-xl opacity-80 pointer-events-none"></div>
+
+        <div
+          id="timer-card"
+          class="bg-gradient-to-b from-white/95 via-white/85 to-orange-50/70 backdrop-blur-xl px-3.5 py-4 sm:px-8 sm:py-7 rounded-[1.8rem] sm:rounded-[2.5rem] border-2 border-white/90 shadow-[0_12px_35px_-10px_rgba(234,88,12,0.2),0_0_0_1px_rgba(255,255,255,0.8)_inset] transition-all duration-700 text-center relative overflow-hidden"
+        >
+          <div class="space-y-1 mb-1.5 sm:mb-3">
+            <span
+              id="status-badge"
+              class="inline-block bg-orange-100/90 text-orange-700 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full uppercase tracking-wider shadow-sm border border-orange-200/50"
+            >
+              🏛️ OPEN HOUSE RMUTI ครั้งที่ 14
+            </span>
+            <div class="text-[10px] sm:text-xs md:text-sm font-black text-slate-700 pt-0.5 leading-snug">
+              ⏳ นับถอยหลังงาน OPEN HOUSE (5 – 6 พ.ย. 2569)
+            </div>
+          </div>
+
+          <div
+            id="realtime-clock"
+            class="text-3xl sm:text-6xl md:text-7xl font-black text-slate-800 tracking-wider font-mono transition-colors duration-500 drop-shadow-sm my-0.5"
+          >
+            00:00:00
+          </div>
+
+          <div
+            id="realtime-date"
+            class="text-[10px] sm:text-xs md:text-base font-bold text-orange-600 tracking-wider transition-colors duration-500"
+          >
+            กำลังโหลดวันที่...
+          </div>
+
+          <div
+            id="countdown-box"
+            class="mt-2.5 pt-2.5 sm:mt-3.5 sm:pt-3 border-t border-slate-200/80 transition-all duration-500 flex justify-center"
+          >
+            <div
+              id="countdown-pill"
+              class="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-white px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl shadow-md border border-orange-400/40 flex flex-wrap items-center justify-center gap-1 sm:gap-2 w-full text-center"
+            >
+              <span class="text-[10px] sm:text-xs md:text-sm font-black tracking-wide whitespace-nowrap drop-shadow-sm">
+                ⏱️ เวลาเหลือก่อนสิ้นสุดงาน:
+              </span>
+              <span
+                id="countdown-text"
+                class="text-[10px] sm:text-xs md:text-base font-black font-mono tracking-wider text-yellow-100 whitespace-nowrap drop-shadow"
+              >
+                -- วัน -- ชม. -- นาที -- วิ
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📢 Title -->
+      <div class="text-center space-y-0.5 sm:space-y-2 pt-0.5">
+        <p class="text-[9px] sm:text-xs md:text-sm tracking-[0.2em] font-extrabold text-orange-600 uppercase">
+          COMPUTER ENGINEERING Dek 70
+        </p>
+        <h1 class="text-2xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 drop-shadow-sm leading-tight">
+          Open
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600">
+            House
+          </span>
+        </h1>
+      </div>
+
+      <!-- 🚀 ปุ่มคำสั่งหลัก (ย้ายขึ้นมาไว้ด้านบน) -->
+      <div class="w-full space-y-2 sm:space-y-3 pt-0.5">
+        <!-- คู่ปุ่มบน: คำแนะนำสาขา และ บุคลากร -->
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            onclick="document.getElementById('menu-modal').classList.remove('hidden')"
+            class="w-full min-h-[46px] bg-white/95 backdrop-blur-md text-orange-600 border-2 border-orange-400 py-2.5 px-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 hover:bg-orange-50 active:scale-95 transition-all shadow-sm cursor-pointer"
+          >
+            <span>💡 คำแนะนำสาขา</span>
+          </button>
+
+          <a
+            href="personnel.html"
+            class="w-full min-h-[46px] bg-white/95 backdrop-blur-md text-slate-800 border-2 border-slate-300 py-2.5 px-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
+          >
+            <span>👨‍🏫 บุคลากร</span>
+          </a>
+        </div>
+
+        <!-- ปุ่มล่าง: เริ่มทำแบบทดสอบ (Quiz) -->
+        <a
+          href="quiz.html"
+          class="w-full min-h-[52px] bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-white py-3 px-5 rounded-2xl font-black text-sm sm:text-lg flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 transition-all shadow-[0_8px_20px_-4px_rgba(245,158,11,0.5)] border border-orange-300/50 group"
+        >
+          <svg
+            class="w-5 h-5 text-white group-hover:rotate-12 transition-transform shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+            ></path>
+          </svg>
+          <span>⚽ เริ่มทำแบบทดสอบ (Quiz)</span>
+        </a>
+      </div>
+
+      <!-- 🖼️ กรอบสี่เหลี่ยมใส่รูปโบรชัวร์ (ย้ายลงมาไว้ด้านล่าง) -->
+      <div class="w-full bg-white/95 backdrop-blur-xl border-2 border-orange-400 rounded-3xl p-3 sm:p-4 shadow-lg relative overflow-hidden">
+        <div class="flex items-center justify-between border-b border-orange-100 pb-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-lg sm:text-xl">🖼️</span>
+            <h2 class="text-xs sm:text-sm font-black text-slate-800">โบรชัวร์แนะนำสาขาวิชา</h2>
+          </div>
+          <button
+            onclick="openImageModal()"
+            class="text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-1 rounded-full shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+          >
+            <span>🔍</span> แตะดูภาพขยาย/ซูม
+          </button>
+        </div>
+
+        <!-- พื้นที่แสดงรูปภาพโบรชัวร์แบบเลื่อน Scroll -->
+        <div class="max-h-[380px] sm:max-h-[450px] overflow-y-auto no-scrollbar rounded-2xl border border-slate-200/80 shadow-inner bg-slate-50 relative group cursor-pointer" onclick="openImageModal()">
+          <img
+            id="brochure-preview-img"
+            src="สไลด์1.JPG"
+            onerror="this.onerror=null; if(this.src.includes('สไลด์1.JPG')){ this.src='Moudeng.jpg'; } else { this.src='image/Moudeng.jpg'; }"
+            alt="โบรชัวร์แนะนำสาขาวิชาวิศวกรรมคอมพิวเตอร์"
+            class="w-full h-auto block rounded-2xl"
+          />
+          <div class="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+            <span class="bg-white/90 text-orange-600 font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border border-orange-200">🔍 คลิกเพื่อซูมขยาย</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 🔍 MODAL LIGHTBOX สำหรับซูมรูปโบรชัวร์ขนาดใหญ่ -->
+    <div
+      id="image-modal"
+      class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden z-50 flex flex-col justify-between p-2 sm:p-4 transition-opacity"
+    >
+      <!-- แถบเครื่องมือซูมด้านบน -->
+      <div class="flex items-center justify-between z-10 bg-slate-900/90 px-3.5 py-2.5 rounded-2xl border border-white/20 shadow-xl max-w-xl mx-auto w-full">
+        <span class="text-white text-xs sm:text-sm font-bold flex items-center gap-1.5">
+          <span>🔍</span> โบรชัวร์สาขา
+        </span>
+
+        <!-- ปุ่มควบคุมการซูม -->
+        <div class="flex items-center gap-1.5">
+          <button
+            onclick="zoomBrochure(1.25)"
+            title="ขยาย"
+            class="w-8 h-8 rounded-full bg-white/20 hover:bg-orange-500 text-white font-black flex items-center justify-center text-lg active:scale-95 transition"
+          >
+            +
+          </button>
+          <button
+            onclick="zoomBrochure(0.8)"
+            title="ย่อ"
+            class="w-8 h-8 rounded-full bg-white/20 hover:bg-orange-500 text-white font-black flex items-center justify-center text-lg active:scale-95 transition"
+          >
+            -
+          </button>
+          <button
+            onclick="resetBrochureZoom()"
+            class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-orange-500 text-white text-[10px] sm:text-xs font-bold active:scale-95 transition"
+          >
+            รีเซ็ต
+          </button>
+          <button
+            onclick="closeImageModal()"
+            class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white font-bold text-xl flex items-center justify-center shadow-lg active:scale-95 transition ml-1 cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- พื้นที่รูปภาพซูมขยาย เลื่อนนิ้วดูได้ง่าย -->
+      <div
+        id="modal-img-wrapper"
+        class="flex-1 overflow-auto flex items-start justify-center p-2 my-2 no-scrollbar"
+      >
+        <img
+          id="modal-brochure-img"
+          src="สไลด์1.JPG"
+          onerror="this.onerror=null; if(this.src.includes('สไลด์1.JPG')){ this.src='Moudeng.jpg'; } else { this.src='image/Moudeng.jpg'; }"
+          alt="โบรชัวร์ขนาดใหญ่"
+          class="max-w-full h-auto block rounded-xl shadow-2xl transition-transform duration-200 origin-top"
+          style="transform: scale(1);"
+        />
+      </div>
+
+      <div class="text-center text-slate-300 text-[10px] sm:text-xs pb-1 font-medium">
+        💡 สามารถกดปุ่ม + / - หรือใช้นิ้วหนีบถ่างขยายหน้าจอเพื่อซูมดูข้อความได้ชัดเจน
+      </div>
+    </div>
+
+    <!-- 🔘 ปุ่มลอยเลือกดูเว็บเพจมหาลัย & ติดต่อเรา (ลอยมุมขวาล่าง) -->
+    <button
+      onclick="openContactModal()"
+      class="fixed bottom-4 right-3.5 sm:bottom-5 sm:right-5 z-40 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full shadow-[0_8px_20px_rgba(245,158,11,0.5)] border-2 border-white/90 flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+      aria-label="ช่องทางการติดต่อ"
+    >
+      <span class="text-lg sm:text-xl animate-bounce">🌐</span>
+      <span class="font-black text-[11px] sm:text-sm tracking-wide">เว็บมหาลัย / ติดต่อ</span>
+    </button>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-2.5 text-center text-[10px] sm:text-[11px] font-bold text-slate-500/80">
+      <p>© Computer Engineering Open House RMUTI</p>
+    </footer>
+
+    <!-- 🌐 MODAL ป๊อปอัปเลื่อนดูเว็บเพจมหาวิทยาลัย & ช่องทางติดต่อ -->
+    <div
+      id="contact-modal"
+      class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 transition-opacity"
+    >
+      <div
+        id="contact-card"
+        class="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative border-t-4 sm:border-4 border-orange-500 max-h-[85vh] flex flex-col justify-between animate-slide-up"
+      >
+        
+        <!-- Header Grab Line สำหรับมือถือ -->
+        <div class="w-12 h-1.5 bg-slate-300/80 rounded-full mx-auto mb-2 sm:hidden cursor-grab active:cursor-grabbing"></div>
+
+        <!-- Header Pop-up -->
+        <div class="border-b border-orange-100 pb-2.5 mb-2.5">
+          <h2 class="text-base sm:text-lg font-black text-slate-800 flex items-center gap-1.5">
+            <span>🌐</span> รวมเว็บเพจ มทร.อีสาน & สาขา
+          </h2>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">เลือกคลิกเพื่อไปยังเว็บเพจที่ต้องการ (เปิดแท็บใหม่)</p>
+        </div>
+
+        <!-- รายการเว็บเพจแบบเลื่อน Scroll ได้ -->
+        <div class="space-y-2 overflow-y-auto no-scrollbar pr-0.5 my-1 flex-1 max-h-[55vh]">
+
+          <!-- เพจ 1: เว็บหลัก มทร.อีสาน -->
+          <a
+            href="https://www.rmuti.ac.th"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between p-3 sm:p-3.5 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-2xl shadow-sm transition active:scale-95 group min-h-[54px]"
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl sm:text-2xl">🏛️</span>
+              <div class="text-left">
+                <div class="text-xs font-black text-slate-800 group-hover:text-orange-600">เว็บไซต์หลัก มทร.อีสาน (RMUTI)</div>
+                <div class="text-[10px] text-slate-500">www.rmuti.ac.th</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-orange-500">&nearr;</span>
+          </a>
+
+          <!-- เพจ 2: คณะวิศวกรรมศาสตร์ -->
+          <a
+            href="https://www.facebook.com/ENTAKORAI"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between p-3 sm:p-3.5 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-2xl shadow-sm transition active:scale-95 group min-h-[54px]"
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl sm:text-2xl">📘</span>
+              <div class="text-left">
+                <div class="text-xs font-black text-slate-800 group-hover:text-orange-600">Facebook: คณะวิศวกรรมศาสตร์และเทคโนโลยี</div>
+                <div class="text-[10px] text-slate-500">https://www.facebook.com/ENTAKORAI</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-orange-500">&nearr;</span>
+          </a>
+
+          <!-- เพจ 3: เพจ Facebook วิศวะคอมพิวเตอร์ -->
+          <a
+            href="https://www.facebook.com/profile.php?id=61552989282087&locale=th_TH"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between p-3 sm:p-3.5 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-2xl shadow-sm transition active:scale-95 group min-h-[54px]"
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl sm:text-2xl">📘</span>
+              <div class="text-left">
+                <div class="text-xs font-black text-slate-800 group-hover:text-orange-600">Facebook: สาขาวิชาวิศวกรรมคอมพิวเตอร์</div>
+                <div class="text-[10px] text-slate-500">ติดตามข่าวสารกิจกรรมและผลงานนักศึกษา</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-orange-500">&nearr;</span>
+          </a>
+
+          <!-- เพจ 4: ระบบรับสมัครนักศึกษา TCAS -->
+          <a
+            href="https://rmuti-quota.gaoapr.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between p-3 sm:p-3.5 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-2xl shadow-sm transition active:scale-95 group min-h-[54px]"
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl sm:text-2xl">🎓</span>
+              <div class="text-left">
+                <div class="text-xs font-black text-slate-800 group-hover:text-orange-600">ระบบสมัครเข้าศึกษาต่อ (โควตาพิเศษ)</div>
+                <div class="text-[10px] text-slate-500">สำนักส่งเสริมวิชาการและงานทะเบียน</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-orange-500">&nearr;</span>
+          </a>
+
+        </div>
+
+        <!-- ปุ่มปิดป็อปอัป -->
+        <button
+          onclick="closeContactModal()"
+          class="w-full mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition active:scale-95 min-h-[44px]"
+        >
+          ← ย้อนกลับ / ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal เมนูคำแนะนำ & คุณสมบัติ -->
+    <div
+      id="menu-modal"
+      class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 transition-opacity"
+    >
+      <div
+        id="menu-card"
+        class="w-full max-w-2xl bg-gradient-to-b from-white to-orange-50/50 rounded-t-3xl sm:rounded-3xl p-4 sm:p-7 shadow-2xl relative max-h-[85vh] overflow-y-auto no-scrollbar border-t-4 sm:border-2 border-orange-400 animate-slide-up"
+      >
+        
+        <!-- Grab handle -->
+        <div class="w-12 h-1.5 bg-slate-300/80 rounded-full mx-auto mb-2 sm:hidden cursor-grab active:cursor-grabbing"></div>
+
+        <div class="flex items-center justify-between border-b border-orange-100 pb-2.5 mb-3">
+          <h2 class="text-lg sm:text-2xl font-black text-slate-800 flex items-center gap-1.5">
+            <span>📚</span> ข้อมูลแนะนำสาขา
+          </h2>
+          <button
+            onclick="document.getElementById('menu-modal').classList.add('hidden')"
+            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-orange-500 hover:text-white text-slate-500 font-bold text-xl flex items-center justify-center transition active:scale-95 shrink-0"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+          <a
+            href="infoengineer.html"
+            class="bg-white border-2 border-orange-400 border-l-8 border-l-orange-500 p-3 sm:p-3.5 rounded-xl shadow-sm active:scale-95 transition-all group"
+          >
+            <h3 class="text-xs sm:text-base font-bold text-slate-800 group-hover:text-orange-600 flex items-center justify-between">
+              <span>💻 วิศวะคอมคือไรอะ?</span>
+              <span class="text-orange-500 font-bold">&rarr;</span>
+            </h3>
+          </a>
+
+          <a
+            href="future.html"
+            class="bg-white border-2 border-orange-400 border-l-8 border-l-orange-500 p-3 sm:p-3.5 rounded-xl shadow-sm active:scale-95 transition-all group"
+          >
+            <h3 class="text-xs sm:text-base font-bold text-slate-800 group-hover:text-orange-600 flex items-center justify-between">
+              <span>🚀 อนาคตจะรอดมั้ย?</span>
+              <span class="text-orange-500 font-bold">&rarr;</span>
+            </h3>
+          </a>
+
+          <a
+            href="worthy.html"
+            class="bg-white border-2 border-orange-400 border-l-8 border-l-orange-500 p-3 sm:p-3.5 rounded-xl shadow-sm active:scale-95 transition-all group"
+          >
+            <h3 class="text-xs sm:text-base font-bold text-slate-800 group-hover:text-orange-600 flex items-center justify-between">
+              <span>🎯 เหมาะกับคนแบบไหน?</span>
+              <span class="text-orange-500 font-bold">&rarr;</span>
+            </h3>
+          </a>
+
+          <a
+            href="final.html"
+            class="bg-white border-2 border-orange-400 border-l-8 border-l-orange-500 p-3 sm:p-3.5 rounded-xl shadow-sm active:scale-95 transition-all group"
+          >
+            <h3 class="text-xs sm:text-base font-bold text-slate-800 group-hover:text-orange-600 flex items-center justify-between">
+              <span>🎓 จบไปทำงานอะไร?</span>
+              <span class="text-orange-500 font-bold">&rarr;</span>
+            </h3>
+          </a>
+
+          <a
+            href="qualification.html"
+            class="bg-white border-2 border-orange-400 border-l-8 border-l-orange-500 p-3 sm:p-3.5 rounded-xl shadow-sm active:scale-95 transition-all group sm:col-span-2"
+          >
+            <h3 class="text-xs sm:text-base font-bold text-slate-800 group-hover:text-orange-600 flex items-center justify-between">
+              <span>📋 คุณสมบัติผู้เข้าศึกษา (ม.6 / ปวช. / ปวส.)</span>
+              <span class="text-orange-500 font-bold">&rarr;</span>
+            </h3>
+          </a>
+
+          <a
+            href="event.html"
+            class="bg-orange-500 text-white p-3 rounded-xl shadow-sm active:scale-95 transition text-center font-bold text-xs sm:text-sm flex items-center justify-center min-h-[44px] sm:col-span-2"
+          >
+            📢 ประกาศงานกิจกรรม
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      // 🔍 ระบบซูมภาพโบรชัวร์ขนาดใหญ่สำหรับมือถือ
+      let brochureScale = 1;
+
+      function openImageModal() {
+        const previewImg = document.getElementById("brochure-preview-img");
+        const modalImg = document.getElementById("modal-brochure-img");
+        if (previewImg && modalImg) {
+          modalImg.src = previewImg.src;
+        }
+        resetBrochureZoom();
+        document.getElementById("image-modal").classList.remove("hidden");
+      }
+
+      function closeImageModal() {
+        document.getElementById("image-modal").classList.add("hidden");
+      }
+
+      function zoomBrochure(factor) {
+        brochureScale = Math.min(Math.max(0.6, brochureScale * factor), 3.5);
+        applyBrochureZoom();
+      }
+
+      function resetBrochureZoom() {
+        brochureScale = 1;
+        applyBrochureZoom();
+      }
+
+      function applyBrochureZoom() {
+        const img = document.getElementById("modal-brochure-img");
+        if (img) {
+          img.style.transform = `scale(${brochureScale})`;
+        }
+      }
+
+      function openContactModal() {
+        document.getElementById("contact-modal").classList.remove("hidden");
+      }
+
+      function closeContactModal() {
+        document.getElementById("contact-modal").classList.add("hidden");
+      }
+
+      const EVENT_END_DATE = new Date(2026, 10, 6, 17, 0, 0).getTime();
+      const WARNING_THRESHOLD_MS = 3 * 60 * 60 * 1000;
+
+      function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+
+        const dateOptions = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+        const dateString = now.toLocaleDateString("th-TH", dateOptions);
+
+        const clockEl = document.getElementById("realtime-clock");
+        const dateEl = document.getElementById("realtime-date");
+        if (clockEl) clockEl.innerText = `${hours}:${minutes}:${seconds}`;
+        if (dateEl) dateEl.innerText = dateString;
+
+        const distance = EVENT_END_DATE - now.getTime();
+        const timerCard = document.getElementById("timer-card");
+        const countdownText = document.getElementById("countdown-text");
+        const statusBadge = document.getElementById("status-badge");
+        const countdownPill = document.getElementById("countdown-pill");
+
+        if (distance <= 0) {
+          if (countdownText) countdownText.innerText = "สิ้นสุดกิจกรรม OPEN HOUSE เรียบร้อยแล้ว";
+          if (statusBadge) {
+            statusBadge.innerText = "● สิ้นสุดกิจกรรม OPEN HOUSE 14";
+            statusBadge.className = "inline-block bg-red-100 text-red-700 text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full shadow-sm";
+          }
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hrs = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((distance % (1000 * 60)) / 1000);
+
+        if (countdownText) {
+          countdownText.innerText = `${days} วัน ${hrs} ชม. ${mins} นาที ${secs} วิ`;
+        }
+
+        if (distance <= WARNING_THRESHOLD_MS) {
+          if (timerCard) timerCard.classList.add("near-end-gradient", "pulse-warning");
+          if (clockEl) clockEl.classList.add("near-end-text");
+          if (dateEl) dateEl.classList.add("near-end-subtext");
+          if (countdownPill) {
+            countdownPill.className = "bg-white/20 text-white border border-white/40 px-3 py-2 rounded-xl backdrop-blur-md flex flex-wrap items-center justify-center gap-1 sm:gap-2 w-full text-center shadow-lg";
+          }
+          if (statusBadge) {
+            statusBadge.innerText = "🔥 ใกล้สิ้นสุดเวลา OPEN HOUSE !";
+            statusBadge.className = "inline-block bg-white/20 text-yellow-200 text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full backdrop-blur-sm border border-white/30";
+          }
+        } else {
+          if (timerCard) timerCard.classList.remove("near-end-gradient", "pulse-warning");
+          if (clockEl) clockEl.classList.remove("near-end-text");
+          if (dateEl) dateEl.classList.remove("near-end-subtext");
+          if (countdownPill) {
+            countdownPill.className = "bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl shadow-md border border-orange-400/40 flex flex-wrap items-center justify-center gap-1 sm:gap-2 w-full text-center";
+          }
+          if (statusBadge) {
+            statusBadge.innerText = "🏛️ OPEN HOUSE RMUTI ครั้งที่ 14";
+            statusBadge.className = "inline-block bg-orange-100/90 text-orange-700 text-[10px] sm:text-xs font-bold px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full uppercase tracking-wider shadow-sm border border-orange-200/50";
+          }
+        }
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      function updateNavUserUI() {
+        const isLoggedIn = localStorage.getItem("cpe_is_logged_in");
+        const userContainer = document.getElementById("nav-user-container");
+
+        if (isLoggedIn === "true") {
+          const firstname = localStorage.getItem("cpe_firstname") || "";
+          const lastname = localStorage.getItem("cpe_lastname") || "";
+          const school = localStorage.getItem("cpe_school") || "";
+
+          userContainer.innerHTML = `
+            <div class="flex items-center gap-1.5 bg-white/90 backdrop-blur border-2 border-orange-500 rounded-2xl px-2 py-1 shadow-sm text-xs md:text-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                <div class="text-left leading-tight">
+                    <div class="font-black text-slate-800 text-[10px] sm:text-xs truncate max-w-[85px] sm:max-w-[130px]">${firstname} ${lastname}</div>
+                    <div class="text-[8px] sm:text-[10px] text-orange-600 font-bold truncate max-w-[85px] sm:max-w-[110px]">${school}</div>
+                </div>
+                <button onclick="logout()" title="ออกจากระบบ" class="ml-0.5 text-slate-400 hover:text-red-500 transition font-bold text-base px-0.5 cursor-pointer">&times;</button>
+            </div>
+          `;
+        } else {
+          userContainer.innerHTML = `
+            <a href="login.html" 
+               class="border-2 border-orange-500 rounded-full px-3.5 py-1.5 text-xs md:text-sm font-bold text-orange-600 bg-white/90 hover:bg-orange-500 hover:text-white transition active:scale-95 shadow-sm inline-block">
+                เข้าสู่ระบบ
+            </a>
+          `;
+        }
+      }
+
+      function logout() {
+        if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+          localStorage.removeItem("cpe_is_logged_in");
+          localStorage.removeItem("cpe_firstname");
+          localStorage.removeItem("cpe_lastname");
+          localStorage.removeItem("cpe_school");
+
+          window.location.href = "login.html";
+        }
+      }
+
+      // 📱 ปรับแต่งฟังก์ชัน Swipe Down to Close ให้สมูตขั้นสุดด้วย requestAnimationFrame และ cubic-bezier
+      function setupSwipeToClose(cardId, closeCallback) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+        let ticking = false;
+
+        card.style.willChange = "transform";
+
+        card.addEventListener("touchstart", (e) => {
+          const scrollableArea = card.querySelector(".overflow-y-auto") || card;
+          if (scrollableArea.scrollTop > 0) {
+            isDragging = false;
+            return;
+          }
+
+          startY = e.touches[0].clientY;
+          isDragging = true;
+          card.style.transition = "none";
+        }, { passive: true });
+
+        card.addEventListener("touchmove", (e) => {
+          if (!isDragging) return;
+          currentY = e.touches[0].clientY;
+          const deltaY = currentY - startY;
+
+          if (deltaY > 0) {
+            if (!ticking) {
+              window.requestAnimationFrame(() => {
+                card.style.transform = `translateY(${deltaY}px)`;
+                ticking = false;
+              });
+              ticking = true;
+            }
+          }
+        }, { passive: true });
+
+        card.addEventListener("touchend", () => {
+          if (!isDragging) return;
+          isDragging = false;
+          const deltaY = currentY - startY;
+
+          card.style.transition = "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)";
+
+          if (deltaY > 90) { // ลากลงมากกว่า 90px ให้สไลด์ปิดแบบนุ่มนวล
+            card.style.transform = "translateY(100%)";
+            setTimeout(() => {
+              closeCallback();
+              card.style.transform = "translateY(0)";
+            }, 280);
+          } else {
+            card.style.transform = "translateY(0)";
+          }
+        });
+      }
+
+      // ✨ ตรวจสอบการล็อกอิน และเปิด Modal อัตโนมัติเมื่อย้อนกลับมาจากหน้าย่อยด้วย ?openModal=true
+      window.addEventListener("DOMContentLoaded", () => {
+        // 🔒 ตรวจสอบการเข้าสู่ระบบ หากยังไม่ได้ล็อกอินให้ไปหน้า login.html ทันที
+        const isLoggedIn = localStorage.getItem("cpe_is_logged_in");
+        if (isLoggedIn !== "true") {
+          window.location.href = "login.html";
+          return;
+        }
+
+        updateNavUserUI();
+
+        // เปิดใช้งานฟังก์ชัน Swipe To Close ความละเอียดสูงสำหรับ Modal ทั้ง 2
+        setupSwipeToClose("contact-card", closeContactModal);
+        setupSwipeToClose("menu-card", () => {
+          document.getElementById("menu-modal").classList.add("hidden");
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("openModal") === "true") {
+          const modal = document.getElementById("menu-modal");
+          if (modal) {
+            modal.classList.remove("hidden");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

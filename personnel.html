@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>แนะนำบุคลากร - วิศวกรรมคอมพิวเตอร์</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="personnestyle.css">
+</head>
+<body class="font-sans antialiased text-slate-800 min-h-screen p-4 bg-slate-50 relative overflow-x-hidden">
+
+    <!-- พื้นหลังสไตล์ขาวหิมะ มินิมอล -->
+    <div class="fixed inset-0 z-0 bg-white pointer-events-none">
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/50 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-100/40 rounded-full blur-3xl"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto pt-6 pb-20">
+        <!-- ปุ่มกดกลับหน้าหลัก -->
+        <button onclick="history.back()" class="mb-6 border-2 border-orange-500 text-orange-600 font-bold px-5 py-2 rounded-full hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-sm flex items-center gap-2 bg-white">
+            &larr; กลับหน้าหลัก
+        </button>
+        
+        <!-- หัวข้อที่ปรับแก้: ล็อกคำว่า วิศวกรรมคอมพิวเตอร์ ไม่ให้ตัดบรรทัด -->
+        <h2 class="text-xl sm:text-3xl md:text-4xl font-black text-center mb-8 text-slate-900 leading-snug">
+            แนะนำบุคลากร <span class="inline-block whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">วิศวกรรมคอมพิวเตอร์</span>
+        </h2>
+        
+        <!-- ================= รายชื่อบุคลากร ================= -->
+        <div class="space-y-6 mb-12">
+            
+            <!-- แถวที่ 1: ประธานสาขา -->
+            <div class="flex justify-center">
+                <div onclick="showPerson(1)" class="person-card w-1/2 sm:w-1/3 md:w-1/4 lg:w-[16%] group cursor-pointer flex flex-col items-center" title="คลิกเพื่อดูรายละเอียด ผศ.ดร. สมเกียรติ">
+                    <span class="bg-orange-600 text-white font-black text-[10px] md:text-xs px-3.5 py-1 rounded-full mb-1.5 shadow-md group-hover:bg-orange-700 transition-colors">ประธานสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/1.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=สมเกียรติ&background=f97316&color=fff&bold=true';" alt="ผศ.ดร. สมเกียรติ" class="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ผศ.ดร. สมเกียรติ</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- แถวที่ 2: ประธานหลักสูตร และ อาจารย์กิจกรรม -->
+            <div class="flex justify-center gap-4 md:gap-6">
+                <div onclick="showPerson(2)" class="person-card w-1/2 sm:w-1/3 md:w-1/4 lg:w-[16%] group cursor-pointer flex flex-col items-center" title="คลิกเพื่อดูรายละเอียด รศ.ดร. วิทยา">
+                    <span class="bg-amber-500 text-white font-bold text-[10px] md:text-xs px-3 py-1 rounded-full mb-1.5 shadow-sm group-hover:bg-amber-600 transition-colors">ประธานหลักสูตร</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/2.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=วิทยา&background=f97316&color=fff&bold=true';" alt="รศ.ดร. วิทยา" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">รศ.ดร. วิทยา</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(3)" class="person-card w-1/2 sm:w-1/3 md:w-1/4 lg:w-[16%] group cursor-pointer flex flex-col items-center" title="คลิกเพื่อดูรายละเอียด อ. นวัตกรรม">
+                    <span class="bg-amber-500 text-white font-bold text-[10px] md:text-xs px-3 py-1 rounded-full mb-1.5 shadow-sm group-hover:bg-amber-600 transition-colors">อาจารย์กิจกรรม</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/3.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=นวัตกรรม&background=f97316&color=fff&bold=true';" alt="อ. นวัตกรรม" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">อ. นวัตกรรม</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- แถวที่ 3: อาจารย์ประจำสาขา (6 ท่าน) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 pt-2">
+                <div onclick="showPerson(4)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/4.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ความปลอดภัย&background=f97316&color=fff&bold=true';" alt="อ. ความปลอดภัย" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">อ. ความปลอดภัย</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(5)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/5.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ซอฟต์แวร์&background=f97316&color=fff&bold=true';" alt="ดร. ซอฟต์แวร์" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ดร. ซอฟต์แวร์</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(6)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/6.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=กฤษฎา&background=f97316&color=fff&bold=true';" alt="ผศ.ดร. กฤษฎา" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ผศ.ดร. กฤษฎา</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(7)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/7.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ชาญชัย&background=f97316&color=fff&bold=true';" alt="ดร. ชาญชัย" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ดร. ชาญชัย</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(8)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/8.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ณัฐพงศ์&background=f97316&color=fff&bold=true';" alt="อ. ณัฐพงศ์" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">อ. ณัฐพงศ์</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(9)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/9.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ธนกฤต&background=f97316&color=fff&bold=true';" alt="รศ.ดร. ธนกฤต" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">รศ.ดร. ธนกฤต</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- แถวที่ 4: อาจารย์ประจำสาขา (6 ท่าน) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                <div onclick="showPerson(10)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/10.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ปรียา&background=f97316&color=fff&bold=true';" alt="ดร. ปรียา" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ดร. ปรียา</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(11)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/11.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ภานุพงศ์&background=f97316&color=fff&bold=true';" alt="อ. ภานุพงศ์" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">อ. ภานุพงศ์</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(12)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/12.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=มนีรัตน์&background=f97316&color=fff&bold=true';" alt="ผศ. มนีรัตน์" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ผศ. มนีรัตน์</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(13)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/13.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ยุทธนา&background=f97316&color=fff&bold=true';" alt="ดร. ยุทธนา" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ดร. ยุทธนา</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(14)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/14.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=รินรดา&background=f97316&color=fff&bold=true';" alt="อ. รินรดา" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">อ. รินรดา</h3>
+                    </div>
+                </div>
+
+                <div onclick="showPerson(15)" class="person-card group cursor-pointer flex flex-col items-center">
+                    <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                    <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                        <img src="photoarjan/15.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ศุภชัย&background=f97316&color=fff&bold=true';" alt="ผศ.ดร. ศุภชัย" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ผศ.ดร. ศุภชัย</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- แถวที่ 5: อาจารย์ประจำสาขา (2 ท่านสุดท้าย) -->
+            <div class="flex justify-center">
+                <div class="grid grid-cols-2 gap-4 w-full sm:w-2/3 md:w-2/6">
+                    <div onclick="showPerson(16)" class="person-card group cursor-pointer flex flex-col items-center">
+                        <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                        <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                            <img src="photoarjan/16.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=อภิสิทธิ์&background=f97316&color=fff&bold=true';" alt="อ. อภิสิทธิ์" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                            <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">อ. อภิสิทธิ์</h3>
+                        </div>
+                    </div>
+
+                    <div onclick="showPerson(17)" class="person-card group cursor-pointer flex flex-col items-center">
+                        <span class="bg-orange-500 text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full mb-1.5 shadow-sm group-hover:bg-orange-600 transition-colors line-clamp-1">อาจารย์ประจำสาขา</span>
+                        <div class="w-full bg-white rounded-2xl shadow-md group-hover:shadow-xl border-2 border-orange-500 active:scale-95 transition-all aspect-square flex flex-col items-center justify-center p-3 text-center">
+                            <img src="photoarjan/17.jpg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=อัญชลี&background=f97316&color=fff&bold=true';" alt="ดร. อัญชลี" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm group-hover:scale-105 transition-transform">
+                            <h3 class="text-xs md:text-sm font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors">ดร. อัญชลี</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal แสดงรายละเอียดอาจารย์ที่กดเลือก -->
+    <div id="person-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 transition-opacity">
+        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl border-t-8 border-orange-500">
+            <!-- ปุ่มปิด -->
+            <button onclick="closePerson()" class="absolute top-3 right-3 text-gray-400 hover:text-black bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold active:scale-95">&times;</button>
+            
+            <div class="p-6 flex flex-col items-center text-center">
+                <!-- รูปโปรไฟล์ -->
+                <img id="modal-img" src="" alt="" class="w-24 h-24 rounded-full object-cover mb-4 shadow-md border-2 border-orange-500">
+                
+                <h3 id="modal-name" class="text-2xl font-black text-slate-800 mb-1">ชื่อ-นามสกุล</h3>
+                <p id="modal-role" class="text-orange-600 font-bold mb-4">ตำแหน่ง</p>
+                
+                <!-- กล่องแสดงรายละเอียดของคนที่ชี้/คลิก -->
+                <div class="w-full bg-slate-50 border border-gray-200 rounded-xl p-4 text-left text-sm text-slate-700 space-y-2">
+                    <div id="modal-detail">รายละเอียดของอาจารย์...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="personnelscript.js"></script>
+</body>
+</html>

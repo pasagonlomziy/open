@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เข้าสู่ระบบ - CPE Open House</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase Cloud SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxRlfiL80TUoeyQDk93PQ5A0W3e37PoSI",
+            authDomain: "elon-musk-c6fa9.firebaseapp.com",
+            projectId: "elon-musk-c6fa9",
+            storageBucket: "elon-musk-c6fa9.firebasestorage.app",
+            messagingSenderId: "609890115150",
+            appId: "1:609890115150:web:428937710422523698ed1f",
+            measurementId: "G-WTHXDEWJMR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.toggleSchoolDetail = function() {
+            const schoolType = document.getElementById("school").value;
+            const container = document.getElementById("school-detail-container");
+            const input = document.getElementById("school-detail");
+            const label = document.getElementById("school-detail-label");
+
+            if (schoolType) {
+                container.classList.remove("hidden");
+                input.required = true;
+                if (schoolType === "โรงเรียน") {
+                    label.innerText = "ชื่อโรงเรียน";
+                    input.placeholder = "กรอกชื่อโรงเรียน (ไม่ต้องใส่โรงเรียนนำหน้า)";
+                } else if (schoolType === "วิทยาลัย") {
+                    label.innerText = "ชื่อวิทยาลัย";
+                    input.placeholder = "กรอกชื่อวิทยาลัย (ไม่ต้องใส่วิทยาลัยนำหน้า)";
+                } else {
+                    label.innerText = "ระบุสังกัด / สถานที่";
+                    input.placeholder = "กรอกชื่อสังกัด หรือระบุ บุคคลทั่วไป...";
+                }
+            } else {
+                container.classList.add("hidden");
+                input.required = false;
+            }
+        };
+
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById("submit-btn");
+            submitBtn.disabled = true;
+            submitBtn.innerText = "กำลังบันทึกข้อมูล...";
+
+            const fname = document.getElementById("firstname").value.trim();
+            const lname = document.getElementById("lastname").value.trim();
+            const schoolType = document.getElementById("school").value;
+            const schoolDetail = document.getElementById("school-detail").value.trim();
+            
+            const fullSchool = `${schoolType} ${schoolDetail}`.trim();
+
+            // 1. บันทึกลง localStorage ของเครื่อง
+            localStorage.setItem("cpe_is_logged_in", "true");
+            localStorage.setItem("cpe_firstname", fname);
+            localStorage.setItem("cpe_lastname", lname);
+            localStorage.setItem("cpe_school", fullSchool);
+
+            // 2. บันทึกลง Firebase Cloud Database (คอลเลกชัน users)
+            try {
+                await addDoc(collection(db, "users"), {
+                    firstname: fname,
+                    lastname: lname,
+                    fullname: `${fname} ${lname}`,
+                    school: fullSchool,
+                    loginTime: new Date().toLocaleString("th-TH"),
+                    createdAt: new Date()
+                });
+            } catch (error) {
+                console.error("Firebase Error:", error);
+            }
+
+            // นำทางไปยังหน้า index.html
+            window.location.href = "index.html";
+        };
+    </script>
+</head>
+<body class="font-sans bg-gradient-to-br from-orange-50 via-white to-amber-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl border-t-8 border-orange-500 p-6 sm:p-8 relative overflow-hidden">
+        <div class="text-center mb-6">
+            <span class="text-xs font-bold tracking-widest text-orange-600 uppercase">CPE Open House</span>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">ลงชื่อเข้าใช้งาน</h1>
+            <p class="text-xs text-slate-500 mt-1">กรุณากรอกข้อมูลเพื่อยืนยันตัวตนก่อนเข้าใช้งาน</p>
+        </div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">ชื่อ</label>
+                <input type="text" id="firstname" required placeholder="กรอกชื่อจริง..." 
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-sm bg-slate-50/50">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">นามสกุล</label>
+                <input type="text" id="lastname" required placeholder="กรอกนามสกุล..." 
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-sm bg-slate-50/50">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">สังกัด</label>
+                <select id="school" required onchange="toggleSchoolDetail()" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-sm bg-slate-50/50 text-slate-700 font-medium">
+                    <option value="" disabled selected>-- เลือกประเภทสังกัด --</option>
+                    <option value="โรงเรียน">โรงเรียน</option>
+                    <option value="วิทยาลัย">วิทยาลัย</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+            </div>
+
+            <div id="school-detail-container" class="hidden">
+                <label id="school-detail-label" class="block text-xs font-bold text-slate-700 mb-1">ระบุชื่อสังกัด</label>
+                <input type="text" id="school-detail" placeholder="กรอกชื่อสังกัด..." 
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-sm bg-slate-50/50">
+            </div>
+
+            <button type="submit" id="submit-btn" 
+                    class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all text-sm mt-4">
+                เข้าสู่ระบบ 🚀
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

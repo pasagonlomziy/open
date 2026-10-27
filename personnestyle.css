@@ -1,0 +1,16 @@
+/* ซ่อน Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Hover Effect สำหรับการ์ดอาจารย์ */
+.person-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.person-card:hover {
+    transform: translateY(-4px);
+}
