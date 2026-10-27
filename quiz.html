@@ -187,13 +187,13 @@
             display: block;
         }
 
-        /* Virtual Analog Joystick UI */
+        /* 📱 Virtual Analog Joystick UI (ปรับขยายขนาดใหม่กดง่าย ถนัดมือ) */
         #joystick-container {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            width: 120px;
-            height: 120px;
+            width: 160px;
+            height: 160px;
             z-index: 30;
             display: flex;
             align-items: center;
@@ -202,14 +202,14 @@
         }
 
         #joystick-base {
-            width: 110px;
-            height: 110px;
-            background: rgba(255, 255, 255, 0.75);
-            border: 3px solid #f97316;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.78);
+            border: 4px solid #f97316;
             border-radius: 50%;
             position: relative;
             backdrop-filter: blur(8px);
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(249, 115, 22, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(249, 115, 22, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -217,13 +217,13 @@
         }
 
         #joystick-stick {
-            width: 48px;
-            height: 48px;
+            width: 64px;
+            height: 64px;
             background: radial-gradient(circle at 35% 35%, #fb923c, #ea580c);
-            border: 2px solid #ffffff;
+            border: 3px solid #ffffff;
             border-radius: 50%;
             position: absolute;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
             pointer-events: none;
             transform: translate(0px, 0px);
         }
@@ -278,7 +278,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 22px;
+            margin-bottom: 14px;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
             text-align: left;
         }
@@ -341,6 +341,19 @@
             text-overflow: ellipsis;
         }
 
+        /* Alert message for played users */
+        .already-played-warning {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px dashed #fca5a5;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: none;
+        }
+
         .btn-group {
             display: flex;
             gap: 10px;
@@ -366,14 +379,23 @@
             gap: 6px;
         }
 
-        .action-btn:hover {
+        .action-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 0 #9a3412, 0 8px 16px rgba(249, 115, 22, 0.35);
         }
 
-        .action-btn:active {
+        .action-btn:active:not(:disabled) {
             transform: translateY(3px);
             box-shadow: 0 2px 0 #9a3412;
+        }
+
+        .action-btn:disabled {
+            background: #cbd5e1 !important;
+            border-color: #f1f5f9 !important;
+            color: #64748b !important;
+            box-shadow: 0 4px 0 #94a3b8 !important;
+            cursor: not-allowed !important;
+            opacity: 0.75;
         }
 
         .secondary-btn {
@@ -394,7 +416,7 @@
             box-shadow: 0 2px 0 #94a3b8;
         }
 
-        /* 🍊 Admin Password Input Field Style */
+        /* Admin Password Input Field Style */
         .admin-input {
             width: 100%;
             padding: 12px 16px;
@@ -421,7 +443,7 @@
 
         /* Quiz Options UI */
         .quiz-question {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 18px;
@@ -441,7 +463,7 @@
             color: #334155;
             padding: 12px 14px;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 14px;
             font-family: 'Kanit', sans-serif;
             font-weight: 600;
             text-align: left;
@@ -529,15 +551,19 @@
                     </div>
                 </div>
 
+                <div class="already-played-warning" id="played-warning-box">
+                    ⚠️ คุณได้ใช้สิทธิ์ทำแบบทดสอบไปเรียบร้อยแล้ว (เล่นได้ 1 ครั้งเท่านั้น)
+                </div>
+
                 <div class="btn-group">
-                    <button class="action-btn" onclick="startGame()">🎮 เริ่มเล่นเกม</button>
+                    <button class="action-btn" id="btn-start-game" onclick="startGame()">🎮 เริ่มเล่นเกม</button>
                     <a href="index.html" class="action-btn secondary-btn">🏠 กลับหน้าหลัก</a>
                     <button class="action-btn secondary-btn" onclick="openAdminModal()">⚙️ หน้าผู้ดูแล</button>
                 </div>
             </div>
         </div>
 
-        <!-- 🔒 Custom Admin Password Modal (โทนส้ม-ขาว สวยงาม) -->
+        <!-- Custom Admin Password Modal -->
         <div class="modal-overlay" id="admin-modal" style="display: none;">
             <div class="card-box" style="max-width: 380px;">
                 <div class="modal-title" style="font-size: 14px;">🔒 สิทธิ์ผู้ดูแลระบบ</div>
@@ -609,15 +635,31 @@
                 </div>
                 <br>
                 <div style="display: flex; gap: 8px; justify-content: center;">
-                    <button class="action-btn" onclick="restartGame()">เล่นอีกครั้ง</button>
-                    <a href="index.html" class="action-btn secondary-btn">หน้าหลัก</a>
+                    <a href="index.html" class="action-btn">🏠 กลับหน้าหลัก</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔒 ระบบ Modal ป้อนรหัสผ่านผู้ดูแลระบบ (Admin)
+        function checkPlayRestriction() {
+            const hasPlayed = localStorage.getItem("cpe_quiz_played") === "true";
+            const startBtn = document.getElementById('btn-start-game');
+            const warningBox = document.getElementById('played-warning-box');
+
+            if (hasPlayed) {
+                if (startBtn) {
+                    startBtn.disabled = true;
+                    startBtn.innerHTML = "❌ ทำแบบทดสอบไปแล้ว";
+                }
+                if (warningBox) {
+                    warningBox.style.display = "block";
+                }
+                return true;
+            }
+            return false;
+        }
+
         function openAdminModal() {
             const input = document.getElementById('admin-pass-input');
             const err = document.getElementById('admin-pass-error');
@@ -694,6 +736,8 @@
             if (dispSchool) {
                 dispSchool.innerText = playerSchool ? `🏫 ${playerSchool}` : "🏫 ไม่ระบุสังกัด";
             }
+
+            checkPlayRestriction();
         }
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -710,29 +754,74 @@
         };
 
         const questions = [
-            { q: "1. ประเภทข้อมูล (Data Type) ใดใช้สำหรับเก็บค่าความจริงเพียง True หรือ False?", options: ["Boolean", "Integer", "Float", "String"], ans: 0 },
-            { q: "2. หมายเลข IPv4 ในระบบเครือข่ายประกอบไปด้วยชุดตัวเลขทั้งหมดกี่ชุด (Octet)?", options: ["2 ชุด", "4 ชุด", "6 ชุด", "8 ชุด"], ans: 1 },
-            { q: "3. โปรโตคอลใดทำหน้าที่รับส่งข้อมูลเว็บเพจแบบมีการเข้ารหัสความปลอดภัย?", options: ["HTTPS", "HTTP", "FTP", "SMTP"], ans: 0 },
-            { q: "4. หน่วยความจำประเภทใดที่ข้อมูลจะไม่สูญหายแม้อยู่ในสถานะปิดเครื่อง?", options: ["ROM", "RAM", "Cache", "SRAM"], ans: 0 },
-            { q: "5. การหลอกลวงทางไซเบอร์เพื่อขโมยข้อมูลส่วนตัวผ่านอีเมลหรือเว็บปลอมเรียกว่าอะไร?", options: ["Phishing", "Spoofing", "Sniffing", "Spamming"], ans: 0 },
-            { q: "6. ภาษามาตรฐานที่ใช้ในการจัดการและสอบถามข้อมูลในฐานข้อมูลเชิงสัมพันธ์คือข้อใด?", options: ["SQL", "HTML", "CSS", "JSON"], ans: 0 },
-            { q: "7. ระบบเลขฐานใดที่คอมพิวเตอร์ใช้ประมวลผลในระดับวงจรอิเล็กทรอนิกส์?", options: ["ฐานสอง", "ฐานแปด", "ฐานสิบ", "ฐานสิบหก"], ans: 0 },
-            { q: "8. นามสกุลไฟล์ในข้อใดใช้สำหรับการติดตั้งโปรแกรมบนระบบ Windows?", options: [".exe", ".apk", ".zip", ".pdf"], ans: 0 },
-            { q: "9. อุปกรณ์เครือข่ายใดทำหน้าที่หาเส้นทางที่เหมาะสมในการส่งข้อมูลข้ามเครือข่าย?", options: ["Router", "Switch", "Hub", "Bridge"], ans: 0 },
-            { q: "10. หน่วยวัดขนาดข้อมูลในระบบคอมพิวเตอร์ ข้อใดมีขนาดความจุมากที่สุด?", options: ["TB", "GB", "MB", "KB"], ans: 0 }
+            { 
+                q: "1. หากเปรียบระดับสัญญาณดิจิทัล 0 และ 1 ในวงจรคอมพิวเตอร์กับสิ่งของในชีวิตประจำวัน สิ่งใดตรงที่สุด?", 
+                options: ["สวิตช์ไฟสถานะ ปิด (0) และ เปิด (1)", "หลอดไฟติดๆ ดับๆ ตามจังหวะเพลง", "ประตูที่เปิดค้างไว้ครึ่งๆ กลางๆ", "ก๊อกน้ำที่น้ำหยดเรื่อยๆ ไม่ยอมหยุด"], 
+                ans: 0 
+            },
+            { 
+                q: "2. เมื่อคอมพิวเตอร์เกิดอาการค้าง แล้ววิศวกรบอกให้ \"ลองกด Restart ดู\" ขั้นตอนนี้ช่วยแก้ปัญหาเบื้องต้นจากเหตุใด?", 
+                options: ["ล้างข้อมูลชั่วคราวในหน่วยความจำ RAM ที่ค้างอยู่", "ช่วยให้ CPU ได้นอนพักผ่อนคลายความเครียด", "เป็นการระบายความร้อนออกจากเคสทันที", "ไล่ไวรัสให้หลุดออกจากสายไฟ"], 
+                ans: 0 
+            },
+            { 
+                q: "3. ในโครงสร้างสถาปัตยกรรมคอมพิวเตอร์ อุปกรณ์ใดทำหน้าที่เปรียบเสมือน \"สมอง\" คอยคิดและประมวลผลคำสั่งทั้งหมด?", 
+                options: ["CPU (Central Processing Unit)", "RAM (Random Access Memory)", "Hard Disk (HDD / SSD)", "Power Supply Unit"], 
+                ans: 0 
+            },
+            { 
+                q: "4. คำว่า \"Bug\" ที่ใช้เรียกข้อผิดพลาดในโปรแกรมคอมพิวเตอร์ มีที่มาจากเหตุการณ์ใดในอดีต?", 
+                options: ["แมลงชีปะขาวบินเข้าไปติดในเครื่องคำนวณหลอดสุญญากาศ", "แมลงสาบกัดสายสัญญาณเน็ตหลุด", "นักเขียนโปรแกรมตั้งชื่อตามสัตว์เลี้ยง", "ยุงบินบังหน้าจอทำให้พิมพ์โค้ดผิด"], 
+                ans: 0 
+            },
+            { 
+                q: "5. สิ่งใดต่อไปนี้ \"ไม่ใช่\" ระบบปฏิบัติการ (Operating System) ที่ใช้บริหารจัดการทรัพยากรเครื่องคอมพิวเตอร์?", 
+                options: ["Google Chrome", "Microsoft Windows", "Linux", "macOS"], 
+                ans: 0 
+            },
+            { 
+                q: "6. ตามกฎของโอห์ม (Ohm's Law) ซึ่งเป็นพื้นฐานวงจรอิเล็กทรอนิกส์ ความสัมพันธ์ของแรงดัน (V), กระแส (I) และความต้านทาน (R) คือข้อใด?", 
+                options: ["V = I × R", "V = I / R", "V = I + R", "V = R / I"], 
+                ans: 0 
+            },
+            { 
+                q: "7. ในวงจรลอจิกดิจิทัลมาตรฐานแบบ TTL (Transistor-Transistor Logic) ระดับแรงดันของ Logic HIGH มักมีค่าประมาณเท่าใด?", 
+                options: ["ประมาณ 5.0 โวลต์ (5V)", "ประมาณ 220 โวลต์ (220V)", "ประมาณ 12.0 โวลต์ (12V)", "ประมาณ 0.0 โวลต์ (0V)"], 
+                ans: 0 
+            },
+            { 
+                q: "8. ลอจิกเกต (Logic Gate) ชนิดใดที่จะส่งผลลัพธ์ออกเป็น 1 (HIGH) ก็ต่อเมื่อค่าอินพุตทั้งหมดเป็น 1 (HIGH) เท่านั้น?", 
+                options: ["AND Gate", "OR Gate", "NOT Gate", "XOR Gate"], 
+                ans: 0 
+            },
+            { 
+                q: "9. ในระบบเครือข่ายคอมพิวเตอร์ หมายเลข IP Address รูปแบบ IPv4 ประกอบด้วยขนาดข้อมูลกี่บิต (Bits)?", 
+                options: ["32 บิต", "64 บิต", "128 บิต", "16 บิต"], 
+                ans: 0 
+            },
+            { 
+                q: "10. ในสถาปัตยกรรมหน่วยประมวลผลกลางแบบ Pipelining ปรากฏการณ์ \"Data Hazard\" เกิดขึ้นจากสาเหตุใดเป็นหลัก?", 
+                options: [
+                    "คำสั่งปัจจุบันต้องใช้อนุพันธ์ผลลัพธ์จากคำสั่งก่อนหน้าที่ยังประมวลผลในขั้นตอน Execute ไม่เสร็จสิ้น", 
+                    "การทำนายทิศทางคำสั่งเงื่อนไข (Branch Prediction) ผิดพลาดทำให้ต้อง Flush Pipeline", 
+                    "เกิดความแออัดในการเข้าถึงบัสฮาร์ดแวร์หรือหน่วยความจำหลักพร้อมกันในหนึ่งรอบสัญญาณนาฬิกา", 
+                    "สัญญาณนาฬิกา (Clock Signal) เกิดการสูญเสียจังหวะซิงโครไนซ์ระหว่าง Register File"
+                ], 
+                ans: 0 
+            }
         ];
 
         const ballTargets = [
-            { id: 0, x: 2 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 1, x: 6 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 2, x: 10 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 3, x: 14 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 4, x: 17 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 5, x: 3 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 6, x: 8 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 7, x: 12 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 8, x: 16 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 9, x: 10 * TILE_SIZE, y: 11 * TILE_SIZE, active: true }
+            { id: 0, x: 10 * TILE_SIZE, y: 11 * TILE_SIZE, active: true },
+            { id: 1, x: 3 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+            { id: 2, x: 8 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+            { id: 3, x: 12 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+            { id: 4, x: 16 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+            { id: 5, x: 2 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+            { id: 6, x: 6 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+            { id: 7, x: 10 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+            { id: 8, x: 14 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+            { id: 9, x: 17 * TILE_SIZE, y: 3 * TILE_SIZE, active: true }
         ];
 
         const keys = { Up: false, Down: false, Left: false, Right: false };
@@ -741,13 +830,13 @@
         let isGameStarted = false;
         let isLBModalOpen = false;
 
-        // ================= VIRTUAL JOYSTICK =================
+        // ================= VIRTUAL JOYSTICK (ปรับสเกลตามขนาดใหม่) =================
         let joystickVector = { x: 0, y: 0 };
         let isJoystickActive = false;
         const joystickBase = document.getElementById('joystick-base');
         const joystickStick = document.getElementById('joystick-stick');
         const joystickContainer = document.getElementById('joystick-container');
-        const maxJoystickRadius = 36;
+        const maxJoystickRadius = 50; // ปรับเพิ่มรัศมีการลากให้สมดุลกับขนาด 150px
 
         function handleJoystickStart(clientX, clientY) {
             if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
@@ -844,6 +933,8 @@
         }
 
         function startGame() {
+            if (checkPlayRestriction()) return;
+
             document.getElementById('player-disp-name').innerText = playerName;
             document.getElementById('start-modal').style.display = 'none';
 
@@ -986,6 +1077,10 @@
 
         function finishGame() {
             clearInterval(timerInterval);
+            
+            // 🔒 บันทึกสถานะว่าผู้เล่นเครื่องนี้เล่นเกมจบแล้ว (ห้ามเล่นซ้ำ)
+            localStorage.setItem("cpe_quiz_played", "true");
+
             document.getElementById('win-summary').innerText = `คุณ ${playerName} ทำคะแนนได้ ${ballsPassed}/10 ข้อ | เวลา ${formatTimeStr(elapsedTimeInSec)}`;
             
             if (window.saveScoreToCloud) window.saveScoreToCloud(playerName, playerSchool, ballsPassed, elapsedTimeInSec);
@@ -1037,7 +1132,24 @@
             const by = ball.y + 16 + hoverY;
             const radius = 14;
 
-            ctx.fillStyle = '#f97316';
+            let pinColor = '#f97316';
+            let baseColor1 = '#ffffff';
+            let baseColor2 = '#e2e8f0';
+            let spotColor = '#0f172a';
+
+            if (ball.id >= 5 && ball.id <= 8) {
+                pinColor = '#eab308';
+                baseColor1 = '#fef08a';
+                baseColor2 = '#eab308';
+                spotColor = '#18181b';
+            } else if (ball.id === 9) {
+                pinColor = '#ef4444';
+                baseColor1 = '#fca5a5';
+                baseColor2 = '#dc2626';
+                spotColor = '#18181b';
+            }
+
+            ctx.fillStyle = pinColor;
             ctx.beginPath();
             ctx.moveTo(bx - 7, by - 24);
             ctx.lineTo(bx + 7, by - 24);
@@ -1052,15 +1164,15 @@
 
             const ballGrad = ctx.createRadialGradient(bx + 5, by - 6, 2, bx, by, radius);
             ballGrad.addColorStop(0, '#ffffff');
-            ballGrad.addColorStop(0.6, '#f1f5f9');
-            ballGrad.addColorStop(1, '#64748b');
+            ballGrad.addColorStop(0.5, baseColor1);
+            ballGrad.addColorStop(1, baseColor2);
 
             ctx.fillStyle = ballGrad;
             ctx.beginPath();
             ctx.arc(bx, by, radius, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = '#0f172a';
+            ctx.fillStyle = spotColor;
             ctx.beginPath(); ctx.arc(bx, by, 4.2, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(bx - 10, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(bx + 10, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
@@ -1335,30 +1447,6 @@
             updatePlayer();
             render();
             requestAnimationFrame(gameLoop);
-        }
-
-        function restartGame() {
-            document.getElementById('win-modal').style.display = 'none';
-            document.getElementById('quiz-modal').style.display = 'none';
-            document.getElementById('lb-view-modal').style.display = 'none';
-            document.getElementById('admin-modal').style.display = 'none';
-            document.getElementById('start-modal').style.display = 'flex';
-
-            isGameStarted = false;
-            isQuizOpen = false;
-            isLBModalOpen = false;
-            ballsPassed = 0;
-            elapsedTimeInSec = 0;
-            clearInterval(timerInterval);
-
-            loadLoggedInUser();
-            ballTargets.forEach(b => b.active = true);
-            document.getElementById('keys-text').innerText = `⚽0/10`;
-            document.getElementById('timer-disp').innerText = `00:00`;
-
-            resetKeys();
-            player.x = 10 * TILE_SIZE;
-            player.y = 13 * TILE_SIZE;
         }
 
         requestAnimationFrame(gameLoop);
