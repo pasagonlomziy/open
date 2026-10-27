@@ -2,9 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบผู้ดูแล - CPE Open House Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard - CPE Open House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (Firestore v10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -22,22 +24,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        function clearLocalQuizData() {
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith("cpe_quiz_played_") || key.startsWith("cpe_quiz_result_") || key.startsWith("cpe_quiz_lb_stack")) {
-                    localStorage.removeItem(key);
-                }
-            });
-        }
-
-        window.resetLocalPlayStatus = function() {
-            clearLocalQuizData();
-            alert("🔓 ปลดล็อกสิทธิ์การทำแบบทดสอบเครื่องนี้เรียบร้อย!");
-            window.location.href = "quiz.html";
-        };
-
-        window.resetFirebaseLeaderboard = async function() {
-            if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลคะแนนทั้งหมดในระบบคลาวด์?")) return;
+        // 🏆 ฟังก์ชันล้างกระดานคะแนน Leaderboard ทั้งหมดบน Cloud
+        window.clearCloudLeaderboard = async function() {
+            if (!confirm("⚠️ คุณต้องการลบกระดานคะแนนทั้งหมดบน Cloud ใช่หรือไม่? (ไม่สามารถกู้คืนได้)")) return;
             try {
                 const querySnapshot = await getDocs(collection(db, "leaderboard"));
                 const deletePromises = [];
@@ -45,16 +34,17 @@
                     deletePromises.push(deleteDoc(doc(db, "leaderboard", document.id)));
                 });
                 await Promise.all(deletePromises);
-                clearLocalQuizData();
-                alert("✅ ล้างกระดานคะแนนเรียบร้อยแล้ว!");
-                window.location.href = "quiz.html";
-            } catch (error) {
-                alert("❌ เกิดข้อผิดพลาด: " + error.message);
+                localStorage.removeItem('cpe_quiz_lb_stack');
+                alert("✅ ล้างกระดานคะแนนทั้งหมดเรียบร้อยแล้ว!");
+            } catch (e) {
+                console.error("Error clearing leaderboard:", e);
+                alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล: " + e.message);
             }
         };
 
-        window.resetFirebaseUsers = async function() {
-            if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบ Log ผู้เข้าใช้งานทั้งหมด?")) return;
+        // 🗑️ ฟังก์ชันล้าง Log รายชื่อผู้ใช้งานทั้งหมดบน Cloud
+        window.clearCloudUserLogs = async function() {
+            if (!confirm("⚠️ คุณต้องการลบ Log รายชื่อผู้ใช้งานทั้งหมดใช่หรือไม่?")) return;
             try {
                 const querySnapshot = await getDocs(collection(db, "users"));
                 const deletePromises = [];
@@ -62,49 +52,157 @@
                     deletePromises.push(deleteDoc(doc(db, "users", document.id)));
                 });
                 await Promise.all(deletePromises);
-                alert("✅ ล้าง Log ผู้ใช้งานเรียบร้อยแล้ว!");
-                location.reload();
-            } catch (error) {
-                alert("❌ เกิดข้อผิดพลาด: " + error.message);
+                alert("✅ ล้าง Log รายชื่อผู้ใช้งานทั้งหมดเรียบร้อยแล้ว!");
+            } catch (e) {
+                console.error("Error clearing user logs:", e);
+                alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล: " + e.message);
             }
         };
     </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f1f5f9;
+            font-family: 'Kanit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .admin-card {
+            background: #ffffff;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 460px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-top: 6px solid #ef4444;
+        }
+
+        .admin-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .admin-subtitle {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .btn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .admin-btn {
+            width: 100%;
+            padding: 13px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .admin-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Colors */
+        .btn-orange { background: #f97316; color: #ffffff; }
+        .btn-amber { background: #f59e0b; color: #ffffff; }
+        .btn-red { background: #ef4444; color: #ffffff; }
+        .btn-darkred { background: #991b1b; color: #ffffff; }
+        .btn-light { background: #e2e8f0; color: #334155; }
+        .btn-dark { background: #1e293b; color: #ffffff; }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-buttons .admin-btn {
+            flex: 1;
+            font-size: 13px;
+            padding: 10px;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
-    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl max-w-md w-full text-center border-t-8 border-red-500">
-        <h1 class="text-2xl font-black text-slate-800 mb-1">⚙️ ผู้ดูแลระบบ (Admin)</h1>
-        <p class="text-xs text-slate-500 mb-6">ศูนย์ควบคุมและรีเซ็ตข้อมูล CPE Open House</p>
-        
-        <div class="space-y-3">
-            <a href="data.html" class="inline-block w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm">
+<body>
+
+    <div class="admin-card">
+        <div class="admin-title">⚙️ ผู้ดูแลระบบ (Admin)</div>
+        <div class="admin-subtitle">ศูนย์ควบคุมและรีเซ็ตข้อมูล CPE Open House</div>
+
+        <div class="btn-list">
+            <!-- ปุ่ม Log คะแนน -->
+            <button class="admin-btn btn-orange" onclick="showLogsNotif()">
                 📋 ดู Log รายชื่อและรายละเอียดคะแนน
-            </a>
+            </button>
 
-            <hr class="border-slate-200 my-2">
-
-            <button onclick="resetLocalPlayStatus()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm cursor-pointer">
+            <!-- 🔓 ปุ่มปลดล็อกสิทธิ์เครื่องนี้ -->
+            <button class="admin-btn btn-amber" onclick="unlockThisDevice()">
                 🔓 ปลดล็อกสิทธิ์การทำแบบทดสอบ (เครื่องนี้)
             </button>
 
-            <button onclick="resetFirebaseLeaderboard()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm cursor-pointer">
+            <!-- ปุ่มล้างข้อมูลบน Cloud -->
+            <button class="admin-btn btn-red" onclick="window.clearCloudLeaderboard()">
                 🏆 ล้างกระดานคะแนนทั้งหมด (Cloud)
             </button>
 
-            <button onclick="resetFirebaseUsers()" class="w-full bg-rose-800 hover:bg-rose-900 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all text-sm cursor-pointer">
+            <button class="admin-btn btn-darkred" onclick="window.clearCloudUserLogs()">
                 🗑️ ล้าง Log รายชื่อผู้ใช้งานทั้งหมด (Cloud)
             </button>
+        </div>
 
-            <hr class="border-slate-200 my-2">
-
-            <div class="grid grid-cols-2 gap-2">
-                <a href="quiz.html" class="inline-block bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 px-3 rounded-xl text-xs">
-                    ← กลับหน้าแบบทดสอบ
-                </a>
-                <a href="index.html" class="inline-block bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-3 rounded-xl text-xs">
-                    🏠 หน้าหลัก
-                </a>
-            </div>
+        <!-- ปุ่มย้อนกลับ -->
+        <div class="nav-buttons">
+            <a href="quiz.html" class="admin-btn btn-light">← กลับหน้าแบบทดสอบ</a>
+            <a href="index.html" class="admin-btn btn-dark">🏠 หน้าหลัก</a>
         </div>
     </div>
+
+    <script>
+        // 🔓 ฟังก์ชันลบสิทธิ์การเล่นเพื่อปลดล็อกเครื่องให้เล่นใหม่ได้
+        function unlockThisDevice() {
+            localStorage.removeItem("cpe_quiz_played");
+            alert("🔓 ปลดล็อกสิทธิ์การทำแบบทดสอบบนเครื่องนี้เรียบร้อยแล้ว!\nคุณสามารถกดกลับไปที่หน้าแบบทดสอบเพื่อเริ่มเล่นใหม่ได้ทันที");
+        }
+
+        function showLogsNotif() {
+            alert("📋 ระบบกำลังดึง Log คะแนนจากเซิร์ฟเวอร์ Cloud...");
+        }
+    </script>
 </body>
 </html>
