@@ -1,1530 +1,1687 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <title>Open House IT Quest - Mobile Perfect Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Firebase SDK (Firestore v10) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        query,
+        limit,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxRlfiL80TUoeyQDk93PQ5A0W3e37PoSI",
-            authDomain: "elon-musk-c6fa9.firebaseapp.com",
-            projectId: "elon-musk-c6fa9",
-            storageBucket: "elon-musk-c6fa9.firebasestorage.app",
-            messagingSenderId: "609890115150",
-            appId: "1:609890115150:web:428937710422523698ed1f",
-            measurementId: "G-WTHXDEWJMR"
-        };
+      const firebaseConfig = {
+        apiKey: "AIzaSyDxRlfiL80TUoeyQDk93PQ5A0W3e37PoSI",
+        authDomain: "elon-musk-c6fa9.firebaseapp.com",
+        projectId: "elon-musk-c6fa9",
+        storageBucket: "elon-musk-c6fa9.firebasestorage.app",
+        messagingSenderId: "609890115150",
+        appId: "1:609890115150:web:428937710422523698ed1f",
+        measurementId: "G-WTHXDEWJMR",
+      };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
-        window.saveScoreToCloud = async function(name, school, scoreTotal, timeInSec) {
-            try {
-                const now = new Date();
-                const dateStr = now.toLocaleDateString("th-TH") + " " + now.toLocaleTimeString("th-TH", { hour: '2-digit', minute: '2-digit' });
-                
-                await addDoc(collection(db, "leaderboard"), {
-                    name: name,
-                    school: school || "ทั่วไป",
-                    score: scoreTotal * 100,
-                    correctTotal: scoreTotal,
-                    easyCorrect: scoreTotal,
-                    mediumCorrect: "-",
-                    hardCorrect: "-",
-                    time: timeInSec,
-                    date: dateStr,
-                    createdAt: serverTimestamp()
-                });
-            } catch (e) {
-                console.error("เกิดข้อผิดพลาดในการบันทึกคะแนน:", e);
-                let list = JSON.parse(localStorage.getItem('cpe_quiz_lb_stack') || '[]');
-                list.push({ name, school, score: scoreTotal * 100, correctTotal: scoreTotal, time: timeInSec });
-                list.sort((a, b) => (b.correctTotal - a.correctTotal) || (a.time - b.time));
-                localStorage.setItem('cpe_quiz_lb_stack', JSON.stringify(list.slice(0, 50)));
+      window.saveScoreToCloud = async function (
+        name,
+        school,
+        scoreTotal,
+        timeInSec,
+      ) {
+        try {
+          const now = new Date();
+          const dateStr =
+            now.toLocaleDateString("th-TH") +
+            " " +
+            now.toLocaleTimeString("th-TH", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+          await addDoc(collection(db, "leaderboard"), {
+            name: name,
+            school: school || "ทั่วไป",
+            score: scoreTotal * 100,
+            correctTotal: scoreTotal,
+            easyCorrect: scoreTotal,
+            mediumCorrect: "-",
+            hardCorrect: "-",
+            time: timeInSec,
+            date: dateStr,
+            createdAt: serverTimestamp(),
+          });
+        } catch (e) {
+          console.error("เกิดข้อผิดพลาดในการบันทึกคะแนน:", e);
+          let list = JSON.parse(
+            localStorage.getItem("cpe_quiz_lb_stack") || "[]",
+          );
+          list.push({
+            name,
+            school,
+            score: scoreTotal * 100,
+            correctTotal: scoreTotal,
+            time: timeInSec,
+          });
+          list.sort(
+            (a, b) => b.correctTotal - a.correctTotal || a.time - b.time,
+          );
+          localStorage.setItem(
+            "cpe_quiz_lb_stack",
+            JSON.stringify(list.slice(0, 50)),
+          );
+        }
+      };
+
+      window.fetchAndRenderLeaderboard = async function (tbodyId) {
+        const tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+        tbody.innerHTML =
+          '<tr><td colspan="4" style="color: #64748b; padding: 15px;">กำลังโหลดสถิติ...</td></tr>';
+
+        try {
+          const q = query(collection(db, "leaderboard"), limit(100));
+          const querySnapshot = await getDocs(q);
+          let list = [];
+          querySnapshot.forEach((docSnap) => {
+            list.push(docSnap.data());
+          });
+
+          list.sort((a, b) => {
+            const scoreA =
+              a.correctTotal !== undefined
+                ? a.correctTotal
+                : Math.floor((a.score || 0) / 100);
+            const scoreB =
+              b.correctTotal !== undefined
+                ? b.correctTotal
+                : Math.floor((b.score || 0) / 100);
+            if (scoreB !== scoreA) {
+              return scoreB - scoreA;
             }
-        };
+            return (a.time || 0) - (b.time || 0);
+          });
 
-        window.fetchAndRenderLeaderboard = async function(tbodyId) {
-            const tbody = document.getElementById(tbodyId);
-            if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="4" style="color: #64748b; padding: 15px;">กำลังโหลดสถิติ...</td></tr>';
+          renderTableRows(tbody, list.slice(0, 50));
+        } catch (e) {
+          console.warn(
+            "ดึงข้อมูลจาก Cloud ไม่สำเร็จ ใชัพลัง LocalStorage สำรอง:",
+            e,
+          );
+          let list = JSON.parse(
+            localStorage.getItem("cpe_quiz_lb_stack") || "[]",
+          );
+          renderTableRows(tbody, list);
+        }
+      };
 
-            try {
-                const q = query(collection(db, "leaderboard"), limit(100));
-                const querySnapshot = await getDocs(q);
-                let list = [];
-                querySnapshot.forEach((docSnap) => {
-                    list.push(docSnap.data());
-                });
-
-                list.sort((a, b) => {
-                    const scoreA = a.correctTotal !== undefined ? a.correctTotal : Math.floor((a.score || 0) / 100);
-                    const scoreB = b.correctTotal !== undefined ? b.correctTotal : Math.floor((b.score || 0) / 100);
-                    if (scoreB !== scoreA) {
-                        return scoreB - scoreA;
-                    }
-                    return (a.time || 0) - (b.time || 0);
-                });
-
-                renderTableRows(tbody, list.slice(0, 50));
-            } catch (e) {
-                console.warn("ดึงข้อมูลจาก Cloud ไม่สำเร็จ ใชัพลัง LocalStorage สำรอง:", e);
-                let list = JSON.parse(localStorage.getItem('cpe_quiz_lb_stack') || '[]');
-                renderTableRows(tbody, list);
-            }
-        };
-
-        function renderTableRows(tbody, list) {
-            tbody.innerHTML = '';
-            if (!list || list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="color: #94a3b8; padding: 20px;">ยังไม่มีสถิติผู้เล่น</td></tr>`;
-                return;
-            }
-            const rankIcons = ['🥇', '🥈', '🥉'];
-            list.forEach((item, idx) => {
-                const tr = document.createElement('tr');
-                const rankDisplay = rankIcons[idx] || (idx + 1);
-                const correctCount = item.correctTotal !== undefined ? item.correctTotal : Math.floor((item.score || 0) / 100);
-                tr.innerHTML = `
+      function renderTableRows(tbody, list) {
+        tbody.innerHTML = "";
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="color: #94a3b8; padding: 20px;">ยังไม่มีสถิติผู้เล่น</td></tr>`;
+          return;
+        }
+        const rankIcons = ["🥇", "🥈", "🥉"];
+        list.forEach((item, idx) => {
+          const tr = document.createElement("tr");
+          const rankDisplay = rankIcons[idx] || idx + 1;
+          const correctCount =
+            item.correctTotal !== undefined
+              ? item.correctTotal
+              : Math.floor((item.score || 0) / 100);
+          tr.innerHTML = `
                     <td>${rankDisplay}</td>
-                    <td style="font-weight: 600; color: #1e293b;">${item.name || '-'}</td>
+                    <td style="font-weight: 600; color: #1e293b;">${item.name || "-"}</td>
                     <td style="color: #ea580c; font-weight: 700;">${correctCount}/10</td>
                     <td style="color: #64748b;">${formatTimeStr(item.time || 0)}</td>
                 `;
-                tbody.appendChild(tr);
-            });
-        }
+          tbody.appendChild(tr);
+        });
+      }
     </script>
 
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-        html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #020617;
-            color: #f8fafc;
-            font-family: 'Kanit', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #020617;
+        color: #f8fafc;
+        font-family: "Kanit", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100dvh;
-            max-width: 800px;
-            max-height: 100dvh;
-            background: #020617;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+      #game-container {
+        position: relative;
+        width: 100vw;
+        height: 100dvh;
+        max-width: 800px;
+        max-height: 100dvh;
+        background: #020617;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
 
-        canvas {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
-            image-rendering: pixelated;
-        }
+      canvas {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+        image-rendering: pixelated;
+      }
 
-        /* Top HUD Bar */
-        #hud {
-            position: absolute;
-            top: calc(env(safe-area-inset-top, 0px) + 8px);
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 4px;
-            z-index: 10;
-            pointer-events: none;
-        }
+      /* Top HUD Bar */
+      #hud {
+        position: absolute;
+        top: calc(env(safe-area-inset-top, 0px) + 8px);
+        left: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+        z-index: 10;
+        pointer-events: none;
+      }
 
-        .hud-badge {
-            background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(249, 115, 22, 0.7);
-            padding: 4px 8px;
-            border-radius: 14px;
-            font-size: 10px;
-            font-weight: 600;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-            pointer-events: auto;
-        }
+      .hud-badge {
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(8px);
+        border: 1.5px solid rgba(249, 115, 22, 0.7);
+        padding: 4px 8px;
+        border-radius: 14px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        pointer-events: auto;
+      }
 
-        .hud-name-text {
-            max-width: 75px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+      .hud-name-text {
+        max-width: 75px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-        .lb-btn-hud {
-            cursor: pointer;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            color: #ffffff;
-            border-color: #ffffff;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-        .lb-btn-hud:hover {
-            background: #c2410c;
-        }
+      .lb-btn-hud {
+        cursor: pointer;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: #ffffff;
+        border-color: #ffffff;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .lb-btn-hud:hover {
+        background: #c2410c;
+      }
 
-        /* Virtual Joystick */
-        #joystick-container {
-            position: absolute;
-            bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-            left: 16px;
-            width: 120px;
-            height: 120px;
-            z-index: 30;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: none;
-        }
+      /* Virtual Joystick */
+      #joystick-container {
+        position: absolute;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        left: 16px;
+        width: 120px;
+        height: 120px;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: none;
+      }
 
-        #joystick-base {
-            width: 110px;
-            height: 110px;
-            background: rgba(15, 23, 42, 0.55);
-            border: 2px solid rgba(249, 115, 22, 0.85);
-            border-radius: 50%;
-            position: relative;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
+      #joystick-base {
+        width: 110px;
+        height: 110px;
+        background: rgba(15, 23, 42, 0.55);
+        border: 2px solid rgba(249, 115, 22, 0.85);
+        border-radius: 50%;
+        position: relative;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
 
-        #joystick-stick {
-            width: 48px;
-            height: 48px;
-            background: radial-gradient(circle at 35% 35%, #fb923c, #ea580c);
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            position: absolute;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-            pointer-events: none;
-            transform: translate(0px, 0px);
-        }
+      #joystick-stick {
+        width: 48px;
+        height: 48px;
+        background: radial-gradient(circle at 35% 35%, #fb923c, #ea580c);
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        position: absolute;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+        transform: translate(0px, 0px);
+      }
 
-        /* Modal Overlays Responsive */
-        .modal-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 14px;
-        }
+      /* Modal Overlays Responsive */
+      .modal-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(10px);
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 14px;
+      }
 
-        .card-box {
-            position: relative;
-            background: #ffffff;
-            border: 3px solid #f97316;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 440px;
-            max-height: 88vh;
-            overflow-y: auto;
-            padding: 22px 16px;
-            box-shadow: 0 20px 50px rgba(249, 115, 22, 0.4);
-            text-align: center;
-            -webkit-overflow-scrolling: touch;
-        }
+      .card-box {
+        position: relative;
+        background: #ffffff;
+        border: 3px solid #f97316;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 440px;
+        max-height: 88vh;
+        overflow-y: auto;
+        padding: 22px 16px;
+        box-shadow: 0 20px 50px rgba(249, 115, 22, 0.4);
+        text-align: center;
+        -webkit-overflow-scrolling: touch;
+      }
 
-        .top-right-lb-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, #f97316, #f59e0b);
-            color: #ffffff;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.35);
-            transition: all 0.2s ease;
-            z-index: 5;
-        }
+      .top-right-lb-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: linear-gradient(135deg, #f97316, #f59e0b);
+        color: #ffffff;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(249, 115, 22, 0.35);
+        transition: all 0.2s ease;
+        z-index: 5;
+      }
 
-        .modal-title {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 13px;
-            color: #ea580c;
-            margin-bottom: 4px;
-            line-height: 1.4;
-            padding-right: 32px;
-        }
+      .modal-title {
+        font-family: "Press Start 2P", monospace;
+        font-size: 13px;
+        color: #ea580c;
+        margin-bottom: 4px;
+        line-height: 1.4;
+        padding-right: 32px;
+      }
 
-        .start-subtext {
-            color: #64748b;
-            font-size: 11px;
-            margin-bottom: 14px;
-            font-weight: 500;
-        }
+      .start-subtext {
+        color: #64748b;
+        font-size: 11px;
+        margin-bottom: 14px;
+        font-weight: 500;
+      }
 
-        .player-profile-card {
-            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-            border: 1.5px solid #fed7aa;
-            border-radius: 12px;
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            text-align: left;
-        }
+      .player-profile-card {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        border: 1.5px solid #fed7aa;
+        border-radius: 12px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        text-align: left;
+      }
 
-        .profile-avatar {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            color: #ffffff;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
+      .profile-avatar {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: #ffffff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
 
-        .profile-info {
-            flex-grow: 1;
-            overflow: hidden;
-        }
+      .profile-info {
+        flex-grow: 1;
+        overflow: hidden;
+      }
 
-        .profile-name-label {
-            font-size: 10px;
-            color: #9a3412;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+      .profile-name-label {
+        font-size: 10px;
+        color: #9a3412;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-        .lock-tag {
-            font-size: 9px;
-            background: #ffedd5;
-            color: #c2410c;
-            border: 1px solid #fdba74;
-            padding: 1px 5px;
-            border-radius: 6px;
-        }
+      .lock-tag {
+        font-size: 9px;
+        background: #ffedd5;
+        color: #c2410c;
+        border: 1px solid #fdba74;
+        padding: 1px 5px;
+        border-radius: 6px;
+      }
 
-        .profile-name-val {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1e293b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+      .profile-name-val {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-        .profile-school-val {
-            font-size: 11px;
-            color: #ea580c;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+      .profile-school-val {
+        font-size: 11px;
+        color: #ea580c;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-        .already-played-warning {
-            color: #dc2626;
-            background: #fef2f2;
-            border: 1px dashed #fca5a5;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: none;
-        }
+      .already-played-warning {
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px dashed #fca5a5;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: none;
+      }
 
-        .btn-group {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+      .btn-group {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
 
-        .action-btn {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            color: #ffffff;
-            border: 2px solid #ffffff;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: 'Kanit', sans-serif;
-            cursor: pointer;
-            box-shadow: 0 3px 0 #9a3412;
-            transition: all 0.15s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
+      .action-btn {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: #ffffff;
+        border: 2px solid #ffffff;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        font-family: "Kanit", sans-serif;
+        cursor: pointer;
+        box-shadow: 0 3px 0 #9a3412;
+        transition: all 0.15s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
 
-        .action-btn:active:not(:disabled) {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #9a3412;
-        }
+      .action-btn:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 #9a3412;
+      }
 
-        .secondary-btn {
-            background: #ffffff;
-            color: #475569;
-            border: 1.5px solid #cbd5e1;
-            box-shadow: 0 3px 0 #94a3b8;
-        }
+      .secondary-btn {
+        background: #ffffff;
+        color: #475569;
+        border: 1.5px solid #cbd5e1;
+        box-shadow: 0 3px 0 #94a3b8;
+      }
 
-        .admin-input {
-            width: 100%;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1.5px solid #fed7aa;
-            background: #fff7ed;
-            font-size: 13px;
-            font-family: 'Kanit', sans-serif;
-            font-weight: 600;
-            color: #1e293b;
-            text-align: center;
-            outline: none;
-        }
+      .admin-input {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1.5px solid #fed7aa;
+        background: #fff7ed;
+        font-size: 13px;
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        color: #1e293b;
+        text-align: center;
+        outline: none;
+      }
 
-        .quiz-question {
-            font-size: 13px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
+      .quiz-question {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 12px;
+        line-height: 1.4;
+      }
 
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            width: 100%;
-        }
+      .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+      }
 
-        .quiz-btn {
-            background: #ffffff;
-            border: 1.5px solid #fed7aa;
-            color: #334155;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-family: 'Kanit', sans-serif;
-            font-weight: 600;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+      .quiz-btn {
+        background: #ffffff;
+        border: 1.5px solid #fed7aa;
+        color: #334155;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
 
-        .quiz-btn.correct-ans {
-            background: #22c55e !important;
-            color: #ffffff !important;
-            border-color: #16a34a !important;
-            font-weight: 700;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
-        }
+      .quiz-btn.correct-ans {
+        background: #22c55e !important;
+        color: #ffffff !important;
+        border-color: #16a34a !important;
+        font-weight: 700;
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+      }
 
-        .quiz-btn.wrong-ans {
-            background: #ef4444 !important;
-            color: #ffffff !important;
-            border-color: #dc2626 !important;
-            font-weight: 700;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-        }
+      .quiz-btn.wrong-ans {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+        border-color: #dc2626 !important;
+        font-weight: 700;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+      }
 
-        .feedback-msg {
-            margin-top: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 8px 14px;
-            border-radius: 20px;
-            display: inline-block;
-            min-height: 34px;
-            line-height: 1.3;
-        }
-        .feedback-success {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1.5px solid #86efac;
-        }
-        .feedback-error {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1.5px solid #fca5a5;
-        }
+      .feedback-msg {
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 8px 14px;
+        border-radius: 20px;
+        display: inline-block;
+        min-height: 34px;
+        line-height: 1.3;
+      }
+      .feedback-success {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1.5px solid #86efac;
+      }
+      .feedback-error {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1.5px solid #fca5a5;
+      }
 
-        .lb-container {
-            max-height: 160px;
-            overflow-y: auto;
-            margin-top: 8px;
-            border-radius: 8px;
-            border: 1.5px solid #fed7aa;
-            background: #ffffff;
-            -webkit-overflow-scrolling: touch;
-        }
+      .lb-container {
+        max-height: 160px;
+        overflow-y: auto;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: 1.5px solid #fed7aa;
+        background: #ffffff;
+        -webkit-overflow-scrolling: touch;
+      }
 
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
+      .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
 
-        .leaderboard-table th, .leaderboard-table td {
-            padding: 5px 6px;
-            border-bottom: 1px solid #ffedd5;
-            text-align: center;
-        }
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding: 5px 6px;
+        border-bottom: 1px solid #ffedd5;
+        text-align: center;
+      }
 
-        .leaderboard-table th { 
-            background: #fff7ed; 
-            color: #ea580c; 
-            font-size: 8px; 
-            position: sticky;
-            top: 0;
-        }
+      .leaderboard-table th {
+        background: #fff7ed;
+        color: #ea580c;
+        font-size: 8px;
+        position: sticky;
+        top: 0;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="game-container">
-        <!-- HUD Bar -->
-        <div id="hud">
-            <a href="index.html" class="hud-badge lb-btn-hud">🏠 หน้าหลัก</a>
-            <div class="hud-badge">👤 <span class="hud-name-text" id="player-disp-name">ผู้เล่น</span></div>
-            <div class="hud-badge" id="timer-disp">⏱️ 00:00</div>
-            <div class="hud-badge" id="keys-text">⚽ 0/10</div>
-            <div class="hud-badge lb-btn-hud" onclick="openLBModal()">🏆 อันดับ</div>
+      <!-- HUD Bar -->
+      <div id="hud">
+        <a href="index.html" class="hud-badge lb-btn-hud">🏠 หน้าหลัก</a>
+        <div class="hud-badge">
+          👤 <span class="hud-name-text" id="player-disp-name">ผู้เล่น</span>
         </div>
+        <div class="hud-badge" id="timer-disp">⏱️ 00:00</div>
+        <div class="hud-badge" id="keys-text">⚽ 0/10</div>
+        <div class="hud-badge lb-btn-hud" onclick="openLBModal()">
+          🏆 อันดับ
+        </div>
+      </div>
 
-        <!-- Main Canvas -->
-        <canvas id="gameCanvas"></canvas>
+      <!-- Main Canvas -->
+      <canvas id="gameCanvas"></canvas>
 
-        <!-- Virtual Analog Joystick -->
-        <div id="joystick-container">
-            <div id="joystick-base">
-                <div id="joystick-stick"></div>
+      <!-- Virtual Analog Joystick -->
+      <div id="joystick-container">
+        <div id="joystick-base">
+          <div id="joystick-stick"></div>
+        </div>
+      </div>
+
+      <!-- Start Screen Modal -->
+      <div class="modal-overlay" id="start-modal">
+        <div class="card-box">
+          <button
+            class="top-right-lb-btn"
+            onclick="openLBModal()"
+            title="ดูอันดับคะแนน"
+          >
+            🏆
+          </button>
+          <div class="modal-title">OPEN HOUSE IT QUEST</div>
+          <p class="start-subtext">ภารกิจสะสมคะแนนสายคอมพิวเตอร์</p>
+
+          <div class="player-profile-card">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-info">
+              <div class="profile-name-label">
+                <span>ผู้เล่นปัจจุบัน</span>
+                <span class="lock-tag">🔒 ล็อกอินแล้ว</span>
+              </div>
+              <div class="profile-name-val" id="disp-player-name">
+                กำลังโหลดชื่อ...
+              </div>
+              <div class="profile-school-val" id="disp-player-school">
+                กำลังโหลดสังกัด...
+              </div>
             </div>
+          </div>
+
+          <div class="already-played-warning" id="played-warning-box">
+            ⚠️ คุณได้ใช้สิทธิ์ทำแบบทดสอบไปเรียบร้อยแล้ว (เล่นได้ 1
+            ครั้งเท่านั้น)
+          </div>
+
+          <div class="btn-group">
+            <button
+              class="action-btn"
+              id="btn-start-game"
+              onclick="startGame()"
+            >
+              🎮 เริ่มเล่นเกม
+            </button>
+            <a href="index.html" class="action-btn secondary-btn"
+              >🏠 กลับหน้าหลัก</a
+            >
+            <button class="action-btn secondary-btn" onclick="openAdminModal()">
+              ⚙️ หน้าผู้ดูแล
+            </button>
+          </div>
         </div>
+      </div>
 
-        <!-- Start Screen Modal -->
-        <div class="modal-overlay" id="start-modal">
-            <div class="card-box">
-                <button class="top-right-lb-btn" onclick="openLBModal()" title="ดูอันดับคะแนน">🏆</button>
-                <div class="modal-title">OPEN HOUSE IT QUEST</div>
-                <p class="start-subtext">ภารกิจสะสมคะแนนสายคอมพิวเตอร์</p>
-                
-                <div class="player-profile-card">
-                    <div class="profile-avatar">👤</div>
-                    <div class="profile-info">
-                        <div class="profile-name-label">
-                            <span>ผู้เล่นปัจจุบัน</span>
-                            <span class="lock-tag">🔒 ล็อกอินแล้ว</span>
-                        </div>
-                        <div class="profile-name-val" id="disp-player-name">กำลังโหลดชื่อ...</div>
-                        <div class="profile-school-val" id="disp-player-school">กำลังโหลดสังกัด...</div>
-                    </div>
-                </div>
+      <!-- Admin Password Modal -->
+      <div class="modal-overlay" id="admin-modal" style="display: none">
+        <div class="card-box" style="max-width: 340px">
+          <div class="modal-title" style="font-size: 12px; padding-right: 0">
+            🔒 สิทธิ์ผู้ดูแลระบบ
+          </div>
+          <p class="start-subtext" style="margin-bottom: 10px">
+            กรุณากรอกรหัสผ่านเพื่อเข้าสู่หน้าผู้ดูแล
+          </p>
 
-                <div class="already-played-warning" id="played-warning-box">
-                    ⚠️ คุณได้ใช้สิทธิ์ทำแบบทดสอบไปเรียบร้อยแล้ว (เล่นได้ 1 ครั้งเท่านั้น)
-                </div>
+          <input
+            type="password"
+            id="admin-pass-input"
+            class="admin-input"
+            placeholder="พิมพ์รหัสผ่านที่นี่..."
+            onkeydown="handleAdminInputKey(event)"
+            autocomplete="off"
+          />
+          <div
+            class="feedback-msg feedback-error"
+            id="admin-pass-error"
+            style="
+              min-height: 18px;
+              margin-top: 4px;
+              margin-bottom: 8px;
+              font-size: 11px;
+            "
+          ></div>
 
-                <div class="btn-group">
-                    <button class="action-btn" id="btn-start-game" onclick="startGame()">🎮 เริ่มเล่นเกม</button>
-                    <a href="index.html" class="action-btn secondary-btn">🏠 กลับหน้าหลัก</a>
-                    <button class="action-btn secondary-btn" onclick="openAdminModal()">⚙️ หน้าผู้ดูแล</button>
-                </div>
-            </div>
+          <div class="btn-group">
+            <button class="action-btn" onclick="checkAdminPassword()">
+              เข้าสู่ระบบ
+            </button>
+            <button
+              class="action-btn secondary-btn"
+              onclick="closeAdminModal()"
+            >
+              ยกเลิก
+            </button>
+          </div>
         </div>
+      </div>
 
-        <!-- Admin Password Modal -->
-        <div class="modal-overlay" id="admin-modal" style="display: none;">
-            <div class="card-box" style="max-width: 340px;">
-                <div class="modal-title" style="font-size: 12px; padding-right: 0;">🔒 สิทธิ์ผู้ดูแลระบบ</div>
-                <p class="start-subtext" style="margin-bottom: 10px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่หน้าผู้ดูแล</p>
-                
-                <input type="password" id="admin-pass-input" class="admin-input" placeholder="พิมพ์รหัสผ่านที่นี่..." onkeydown="handleAdminInputKey(event)" autocomplete="off">
-                <div class="feedback-msg feedback-error" id="admin-pass-error" style="min-height: 18px; margin-top: 4px; margin-bottom: 8px; font-size: 11px;"></div>
+      <!-- Standalone Leaderboard Modal -->
+      <div class="modal-overlay" id="lb-view-modal" style="display: none">
+        <div class="card-box">
+          <div
+            class="modal-title"
+            style="color: #ea580c; font-size: 12px; padding-right: 0"
+          >
+            LEADERBOARD 🏆
+          </div>
+          <p
+            style="
+              color: #64748b;
+              font-size: 11px;
+              margin-bottom: 4px;
+              font-weight: 500;
+            "
+          >
+            อันดับสถิติสะสมของผู้เล่นทั้งหมด (Cloud)
+          </p>
 
-                <div class="btn-group">
-                    <button class="action-btn" onclick="checkAdminPassword()">เข้าสู่ระบบ</button>
-                    <button class="action-btn secondary-btn" onclick="closeAdminModal()">ยกเลิก</button>
-                </div>
-            </div>
+          <div class="lb-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>NAME</th>
+                  <th>SCORE</th>
+                  <th>TIME</th>
+                </tr>
+              </thead>
+              <tbody id="lb-view-body"></tbody>
+            </table>
+          </div>
+          <br />
+          <button class="action-btn secondary-btn" onclick="closeLBModal()">
+            ปิดหน้าต่าง
+          </button>
         </div>
+      </div>
 
-        <!-- Standalone Leaderboard Modal -->
-        <div class="modal-overlay" id="lb-view-modal" style="display: none;">
-            <div class="card-box">
-                <div class="modal-title" style="color: #ea580c; font-size: 12px; padding-right: 0;">LEADERBOARD 🏆</div>
-                <p style="color: #64748b; font-size: 11px; margin-bottom: 4px; font-weight: 500;">อันดับสถิติสะสมของผู้เล่นทั้งหมด (Cloud)</p>
-                
-                <div class="lb-container">
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>NAME</th>
-                                <th>SCORE</th>
-                                <th>TIME</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lb-view-body"></tbody>
-                    </table>
-                </div>
-                <br>
-                <button class="action-btn secondary-btn" onclick="closeLBModal()">ปิดหน้าต่าง</button>
-            </div>
+      <!-- Quiz Mission Modal -->
+      <div class="modal-overlay" id="quiz-modal" style="display: none">
+        <div class="card-box">
+          <div
+            class="modal-title"
+            id="quiz-gate-num"
+            style="font-size: 11px; padding-right: 0"
+          >
+            MISSION #1
+          </div>
+          <div class="quiz-question" id="quiz-question">
+            คำถามคอมพิวเตอร์...
+          </div>
+          <div class="quiz-options" id="quiz-options"></div>
+          <div
+            class="feedback-msg"
+            id="quiz-feedback"
+            style="display: none"
+          ></div>
         </div>
+      </div>
 
-        <!-- Quiz Mission Modal -->
-        <div class="modal-overlay" id="quiz-modal" style="display: none;">
-            <div class="card-box">
-                <div class="modal-title" id="quiz-gate-num" style="font-size: 11px; padding-right: 0;">MISSION #1</div>
-                <div class="quiz-question" id="quiz-question">คำถามคอมพิวเตอร์...</div>
-                <div class="quiz-options" id="quiz-options"></div>
-                <div class="feedback-msg" id="quiz-feedback" style="display: none;"></div>
-            </div>
-        </div>
+      <!-- Victory Modal -->
+      <div class="modal-overlay" id="win-modal" style="display: none">
+        <div class="card-box">
+          <div
+            class="modal-title"
+            style="color: #16a34a; font-size: 13px; padding-right: 0"
+          >
+            MISSION COMPLETED! 🏆
+          </div>
+          <p
+            id="win-summary"
+            style="
+              font-size: 12px;
+              margin-bottom: 6px;
+              color: #1e293b;
+              font-weight: 600;
+            "
+          ></p>
 
-        <!-- Victory Modal -->
-        <div class="modal-overlay" id="win-modal" style="display: none;">
-            <div class="card-box">
-                <div class="modal-title" style="color: #16a34a; font-size: 13px; padding-right: 0;">MISSION COMPLETED! 🏆</div>
-                <p id="win-summary" style="font-size: 12px; margin-bottom: 6px; color: #1e293b; font-weight: 600;"></p>
-                
-                <h3 style="color: #ea580c; font-size: 9px; margin-top: 6px; margin-bottom: 4px; font-family: 'Press Start 2P', monospace;">LEADERBOARD (อันดับสะสม)</h3>
-                <div class="lb-container">
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>NAME</th>
-                                <th>SCORE</th>
-                                <th>TIME</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-body"></tbody>
-                    </table>
-                </div>
-                <br>
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <a href="index.html" class="action-btn">🏠 กลับหน้าหลัก</a>
-                </div>
-            </div>
+          <h3
+            style="
+              color: #ea580c;
+              font-size: 9px;
+              margin-top: 6px;
+              margin-bottom: 4px;
+              font-family: &quot;Press Start 2P&quot;, monospace;
+            "
+          >
+            LEADERBOARD (อันดับสะสม)
+          </h3>
+          <div class="lb-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>NAME</th>
+                  <th>SCORE</th>
+                  <th>TIME</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-body"></tbody>
+            </table>
+          </div>
+          <br />
+          <div style="display: flex; gap: 6px; justify-content: center">
+            <a href="index.html" class="action-btn">🏠 กลับหน้าหลัก</a>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        function checkPlayRestriction() {
-            const hasPlayed = localStorage.getItem("cpe_quiz_played") === "true";
-            const startBtn = document.getElementById('btn-start-game');
-            const warningBox = document.getElementById('played-warning-box');
-
-            if (hasPlayed) {
-                if (startBtn) {
-                    startBtn.disabled = true;
-                    startBtn.innerHTML = "❌ ทำแบบทดสอบไปแล้ว";
-                }
-                if (warningBox) {
-                    warningBox.style.display = "block";
-                }
-                return true;
-            }
-            return false;
-        }
-
-        function openAdminModal() {
-            const input = document.getElementById('admin-pass-input');
-            const err = document.getElementById('admin-pass-error');
-            input.value = '';
-            err.innerText = '';
-            document.getElementById('admin-modal').style.display = 'flex';
-            setTimeout(() => input.focus(), 100);
-        }
-
-        function closeAdminModal() {
-            document.getElementById('admin-modal').style.display = 'none';
-        }
-
-        function checkAdminPassword() {
-            const input = document.getElementById('admin-pass-input');
-            const err = document.getElementById('admin-pass-error');
-            
-            if (input.value === "cpe69231") {
-                window.location.href = "resetboard.html";
-            } else {
-                err.innerText = "❌ รหัสผ่านไม่ถูกต้อง!";
-                input.value = '';
-                input.focus();
-            }
-        }
-
-        function handleAdminInputKey(e) {
-            if (e.key === 'Enter') {
-                checkAdminPassword();
-            }
-        }
-
-        function formatTimeStr(sec) {
-            const m = String(Math.floor(sec / 60)).padStart(2, '0');
-            const s = String(sec % 60).padStart(2, '0');
-            return `${m}:${s}`;
-        }
-
-        // ================= GAME ENGINE =================
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        const TILE_SIZE = 32;
-        const MAP_WIDTH = 20;  // 640px
-        const MAP_HEIGHT = 16; // 512px
-
-        canvas.width = MAP_WIDTH * TILE_SIZE;
-        canvas.height = MAP_HEIGHT * TILE_SIZE;
-
-        let playerName = "ผู้เยี่ยมชม";
-        let playerSchool = "";
-        let ballsPassed = 0;
-        let animFrame = 0;
-
-        let startTime = 0;
-        let timerInterval = null;
-        let elapsedTimeInSec = 0;
-
-        function loadLoggedInUser() {
-            const fname = localStorage.getItem("cpe_firstname") || "";
-            const lname = localStorage.getItem("cpe_lastname") || "";
-            playerSchool = localStorage.getItem("cpe_school") || "";
-
-            if (fname !== "") {
-                playerName = (fname + " " + lname).trim();
-            } else {
-                playerName = "ผู้เยี่ยมชม";
-            }
-
-            const dispName = document.getElementById('disp-player-name');
-            if (dispName) dispName.innerText = playerName;
-
-            const dispPlayerHud = document.getElementById('player-disp-name');
-            if (dispPlayerHud) dispPlayerHud.innerText = playerName;
-
-            const dispSchool = document.getElementById('disp-player-school');
-            if (dispSchool) {
-                dispSchool.innerText = playerSchool ? `🏫 ${playerSchool}` : "🏫 ไม่ระบุสังกัด";
-            }
-
-            checkPlayRestriction();
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            loadLoggedInUser();
-        });
-
-        const player = {
-            x: 10 * TILE_SIZE,
-            y: 13 * TILE_SIZE,
-            width: 24,
-            height: 24,
-            speed: 2.4,
-            isMoving: false
-        };
-
-        // ================= 📚 คลังคำถาม 60 ข้อ (ปรับสมดุลความยาวช้อยส์ 100%) =================
-        const questionPool = {
-            easy: [
-                { q: "หากเปรียบระดับสัญญาณดิจิทัล 0 และ 1 ในคอมพิวเตอร์กับสิ่งของในชีวิตประจำวัน สิ่งใดตรงที่สุด?", options: ["สวิตช์ไฟที่เปิด (1) หรือ ปิด (0)", "หลอดไฟที่เร่งความสว่าง (1) ถึง (0)", "ประตูที่เปิดค้างไว้ระหว่าง (1) ถึง (0)", "พัดลมที่ปรับระดับความเร็ว (1) ถึง (0)"], ans: 0 },
-                { q: "เมื่อคอมพิวเตอร์เกิดอาการค้าง แล้วบอกให้ \"ลองกด Restart ดู\" ขั้นตอนนี้ช่วยแก้ปัญหาจากเหตุใด?", options: ["การเคลียร์ข้อมูลชั่วคราวใน RAM ที่ค้างอยู่", "การลบไฟล์ขยะและไวรัสในระบบปฏิบัติการ", "การระบายความร้อนออกจากชิปประมวลผล CPU", "การปรับระดับแรงดันไฟฟ้าในแผงวงจรหลัก"], ans: 0 },
-                { q: "คำว่า \"Bug\" ที่ใช้เรียกข้อผิดพลาดในโปรแกรมคอมพิวเตอร์ มีที่มาจากเหตุการณ์ใดในอดีต?", options: ["แมลงชีปะขาวบินติดในเครื่องคำนวณหลอดสุญญากาศ", "สายเคเบิลถูกแมลงและสัตว์กัดจนขาดเสียหาย", "ฝุ่นละอองเกาะวงจรไฟฟ้าจนเกิดความร้อนสูง", "สัญญาณความถี่วิทยุแทรกซ้อนในวงจรคอมพิวเตอร์"], ans: 0 },
-                { q: "ปุ่ม Ctrl + Z บนคีย์บอร์ดคอมพิวเตอร์ เปรียบเสมือนอะไรในชีวิตจริง?", options: ["การย้อนกลับการทำงานล่าสุด (Undo)", "การยกเลิกคำสั่งพิมพ์เอกสาร (Cancel)", "การลบข้อความที่เลือกทิ้งทันที (Delete)", "การสลับไปยังหน้าต่างก่อนหน้า (Switch)"], ans: 0 },
-                { q: "อุปกรณ์ใดในคอมพิวเตอร์ทำหน้าที่เปรียบเสมือน \"สมอง\" คอยคิดและประมวลผลคำสั่ง?", options: ["หน่วยประมวลผลกลาง (CPU)", "หน่วยความจำหลัก (RAM)", "หน่วยจัดเก็บข้อมูล (SSD)", "หน่วยจ่ายกระแสไฟฟ้า (PSU)"], ans: 0 },
-                { q: "\"RAM\" ในคอมพิวเตอร์ต่างจาก \"Hard Disk\" อย่างไร?", options: ["RAM เก็บข้อมูลชั่วคราว ส่วน Hard Disk เก็บถาวร", "RAM เก็บไฟล์ระบบ ส่วน Hard Disk เก็บไฟล์รูปภาพ", "RAM ใช้แสดงผลภาพ ส่วน Hard Disk ใช้คำนวณข้อมูล", "RAM ทำงานช้ากว่า ส่วน Hard Disk ทำงานได้ไวกว่า"], ans: 0 },
-                { q: "สิ่งใดต่อไปนี้ \"ไม่ใช่\" ระบบปฏิบัติการ (Operating System)?", options: ["Google Chrome Browser", "Microsoft Windows 11", "Linux Ubuntu System", "Apple macOS Ventura"], ans: 0 },
-                { q: "การทำ \"Phishing\" ในโลกไอที หมายถึงพฤติกรรมใด?", options: ["การสร้างเว็บไซต์ปลอมหลอกเอาข้อมูลและรหัสผ่าน", "การแอบเจาะระบบเน็ตเวิร์กเพื่อดักจับไฟล์ข้อมูลงาน", "การส่งไวรัสผ่านสายเคเบิลเพื่อลบไฟล์ข้อมูลในเครื่อง", "การเปิดหน้าเว็บทิ้งไว้หลายหน้าจนเครื่องเกิดอาการค้าง"], ans: 0 },
-                { q: "เมื่อกด Empty Recycle Bin ใน Windows ข้อมูลในไฟล์นั้นจะเกิดอะไรขึ้น?", options: ["การลบดัชนีชี้ตำแหน่งไฟล์เพื่อเตรียมเขียนทับ", "การบีบอัดไฟล์ทั้งหมดไปซ่อนไว้ในระบบสำรอง", "การส่งไฟล์ทั้งหมดขึ้นไปเก็บไว้บนระบบคลาวด์", "การทำการฟอร์แมตฮาร์ดดิสก์ใหม่ทั้งลูกทันที"], ans: 0 },
-                { q: "โหมด Incognito (หน้าต่างส่วนตัว) ในเว็บเบราว์เซอร์ ป้องกันสิ่งใด?", options: ["ไม่บันทึกประวัติการท่องเว็บและคุกกี้ในเครื่องเรา", "ซ่อนตำแหน่ง IP Address จากผู้ให้บริการอินเทอร์เน็ต", "ป้องกันไวรัสและมัลแวร์เข้าสู่คอมพิวเตอร์ 100%", "บล็อกโฆษณาและสคริปต์บนหน้าเว็บทั้งหมดอัตโนมัติ"], ans: 0 },
-                { q: "ชื่อเทคโนโลยีเชื่อมต่อไร้สาย \"Bluetooth\" มีที่มาจากสิ่งใด?", options: ["ฉายาของกษัตริย์ไวกิ้งในอดีต (Harald Bluetooth)", "ชื่อค่ายนักวิจัยผู้ค้นพบคลื่นวิทยุ (Robert Bluetooth)", "ชื่อสายพันธุ์สัตว์น้ำใต้ทะเลลึก (Blue Tooth Shark)", "ยี่ห้ออุปกรณ์สื่อสารยุคแรก (Bluetooth Mobile)"], ans: 0 },
-                { q: "ทำไมสาย LAN ถึงต้องตีเกลียวเป็นคู่ๆ (Twisted Pair)?", options: ["การลดสัญญาณรบกวนข้ามสาย (Crosstalk)", "การเพิ่มความแข็งแรงทนทาน (Durability)", "การขยายความกว้างช่องสัญญาณ (Bandwidth)", "การประหยัดพื้นที่จัดเก็บสาย (Space Saving)"], ans: 0 },
-                { q: "ข้อใดคือความหมายของคำว่า \"Cloud Storage\"?", options: ["การฝากไฟล์ไว้บนเซิร์ฟเวอร์ผ่านอินเทอร์เน็ต", "การเชื่อมต่อฮาร์ดดิสก์แบบไร้สายระยะใกล้", "การเก็บบันทึกข้อมูลลงในชิประบบดาวเทียม", "การบีบอัดไฟล์เอกสารให้มีขนาดเล็กลงมาก"], ans: 0 },
-                { q: "ระบบ \"CAPTCHA\" ที่ให้เราติ๊กเลือกรูปภาพก่อนเข้าเว็บ มีไว้เพื่ออะไร?", options: ["การแยกแยะระหว่างผู้ใช้มนุษย์กับโปรแกรมบอท", "การตรวจสอบความไวในการพิมพ์และตอบสนองของผู้ใช้", "การป้องกันความร้อนสูงของเครื่องเซิร์ฟเวอร์เว็บไซต์", "การบันทึกข้อมูลพฤติกรรมการซื้อสินค้าของผู้ใช้งาน"], ans: 0 },
-                { q: "การตั้งรหัสผ่านข้อใดปลอดภัยและเดายากที่สุดตามหลัก Cyber Security?", options: ["P@ssW0rd_CPE#2026", "K@seTsart_U#2026", "S3cur3_Syt3m#2026", "Admin_N3tw0rk#2026"], ans: 0 },
-                { q: "ปุ่ม F5 บนคีย์บอร์ดขณะใช้งานเว็บเบราว์เซอร์มีไว้ทำอะไร?", options: ["การโหลดหน้าเว็บปัจจุบันใหม่ (Refresh Page)", "การปิดหน้าต่างโปรแกรมทันที (Close Window)", "การเปิดโหมดการแสดงผลเต็มจอ (Full Screen)", "การค้นหาคำในหน้าเว็บปัจจุบัน (Find Text)"], ans: 0 },
-                { q: "มัลแวร์ประเภท \"Ransomware\" มีพฤติกรรมอันตรายอย่างไร?", options: ["การเข้ารหัสล็อกไฟล์ข้อมูลแล้วขู่เรียกค่าไถ่", "การแอบเปิดกล้องและไมโครโฟนเพื่อดักฟังข้อมูล", "การลบไฟล์ระบบปฏิบัติการทิ้งจนเครื่องเปิดไม่ติด", "การสั่งให้เครื่องขุดเหรียญคริปโทจนเกิดความร้อนสูง"], ans: 0 },
-                { q: "นามสกุลไฟล์เอกสารยอดนิยมแบบ \".pdf\" ย่อมาจากอะไร?", options: ["Portable Document Format", "Personal Data File System", "Public Digital Format Type", "Printed Document Process"], ans: 0 },
-                { q: "ทำไมซื้อ Flash Drive 16GB พอนำมาเสียบเครื่องคอมถึงเห็นความจุแค่ประมาณ 14.8GB?", options: ["คอมพิวเตอร์นับฐานสอง แต่ผู้ผลิตนับฐานสิบ", "ระบบปฏิบัติการจองพื้นที่ไว้ใช้ทำระบบสำรอง", "ตารางดัชนีไฟล์ยึดพื้นที่บางส่วนไปใช้งาน", "ชิปบันทึกข้อมูลมีพื้นที่สูญเสียจากการผลิต"], ans: 0 },
-                { q: "ชิปประมวลผล \"GPU\" ย่อมาจากอะไรและเน้นประมวลผลสิ่งใด?", options: ["Graphics Processing Unit (เน้นภาพ 3D)", "General Processing Unit (เน้นคำสั่งทั่วไป)", "Global Processing Unit (เน้นพิกัดดาวเทียม)", "Gigabyte Processing Unit (เน้นจัดการ RAM)"], ans: 0 },
-                { q: "อาการ \"Blue Screen of Death (BSOD)\" บน Windows เกิดจากสาเหตุใด?", options: ["ข้อผิดพลาดร้ายแรงของระบบปฏิบัติการหรือฮาร์ดแวร์", "การติดไวรัสคอมพิวเตอร์ที่ทำการลบไฟล์วอลเปเปอร์", "จอภาพเกิดความเสียหายทางกายภาพจนไม่แสดงสีภาพ", "สัญญาณอินเทอร์เน็ตขาดหายขณะกำลังอัปเดตระบบ"], ans: 0 },
-                { q: "ข้อผิดพลาด \"404 Not Found\" บนเว็บเบราว์เซอร์หมายถึงสิ่งใด?", options: ["ไม่พบหน้าเว็บที่ต้องการบนเครื่องเซิร์ฟเวอร์", "ปฏิเสธการเข้าถึงเนื่องจากรหัสผ่านไม่ถูกต้อง", "เซิร์ฟเวอร์ปลายทางตอบสนองช้าเกินเวลากำหนด", "การเชื่อมต่อเครือข่ายอินเทอร์เน็ตหลุดขัดข้อง"], ans: 0 },
-                { q: "หน้าที่หลักของ Power Supply (PSU) ในคอมพิวเตอร์คืออะไร?", options: ["การแปลงไฟบ้าน AC เป็น DC จ่ายให้อุปกรณ์", "การสำรองกระแสไฟฟ้าเมื่อเกิดเหตุการณ์ไฟดับ", "การควบคุมและระบายความร้อนให้เคสคอมพิวเตอร์", "การควบคุมจังหวะสัญญาณนาฬิกาให้เมนบอร์ด"], ans: 0 },
-                { q: "คำว่า \"AI\" ย่อมาจากคำว่าอะไร?", options: ["Artificial Intelligence", "Advanced Integration", "Automated Interface", "Algorithm Information"], ans: 0 },
-                { q: "\"Cookie\" ในเว็บไซต์ทำหน้าที่อะไร?", options: ["ไฟล์ขนาดเล็กที่เว็บบันทึกเพื่อจำสถานะผู้ใช้", "สคริปต์อันตรายที่แอบดักจับรหัสผ่านของผู้ใช้", "ไฟล์ขยะชั่วคราวที่สร้างขึ้นเมื่อเปิดดูวิดีโอ", "โปรแกรมช่วยเร่งความเร็วการดาวน์โหลดไฟล์"], ans: 0 },
-                { q: "โปรแกรม Anti-Virus ตรวจจับไวรัสในเครื่องด้วยวิธีใดเป็นหลัก?", options: ["การตรวจสอบเทียบกับฐานข้อมูลลายเซ็น (Signatures)", "การตรวจสอบความร้อนของชิป CPU ขณะรันไฟล์งาน", "การตรวจสอบขนาดไฟล์ที่เพิ่มขึ้นในฮาร์ดดิสก์เครื่อง", "การตรวจสอบการใช้งานอินเทอร์เน็ตของโปรแกรมต่างๆ"], ans: 0 },
-                { q: "สัญญาณไฟแสดงสถานะการรับส่งข้อมูลของพอร์ต LAN มักมีสีอะไรบ้าง?", options: ["สีเขียว (Link) และ สีส้ม (Activity)", "สีแดง (Power) และ สีน้ำเงิน (Data)", "สีขาว (Online) และ สีม่วง (Error)", "สีเหลือง (Speed) และ สีฟ้า (Status)"], ans: 0 },
-                { q: "การกดคีย์ลัด Alt + F4 บนระบบปฏิบัติการ Windows ผลลัพธ์คืออะไร?", options: ["การปิดโปรแกรมหรือหน้าต่างที่กำลังใช้งานอยู่", "การเปิดหน้าต่างเครื่องคิดเลขระบบ (Calculator)", "การสลับการแสดงผลไปยังหน้าจอหลัก (Desktop)", "การรีสตาร์ตระบบปฏิบัติการทันทีโดยไม่ถามผู้ใช้"], ans: 0 },
-                { q: "คำว่า \"Pixel\" ในหน้าจอแสดงผลหมายถึงอะไร?", options: ["จุดสีเล็กๆ ที่ประกอบกันเป็นภาพบนหน้าจอ", "อัตราความไวในการตอบสนองของแผงวงจรจอภาพ", "ความจุของหน่วยความจำการ์ดแสดงผลภาพกราฟิก", "ระดับความสว่างสูงสุดของหลอดภาพหน้าจอคอม"], ans: 0 },
-                { q: "คำว่า \"URL\" ที่เราใช้พิมพ์ที่อยู่เว็บไซต์ ย่อมาจากคำว่าอะไร?", options: ["Uniform Resource Locator", "Universal Radio Link System", "User Route List Protocol", "Unified Record Lane Access"], ans: 0 }
-            ],
-            medium: [
-                { q: "ตามกฎของโอห์ม (Ohm's Law) ความสัมพันธ์ของแรงดัน (V), กระแส (I) และความต้านทาน (R) คือข้อใด?", options: ["V = I × R (แรงดัน = กระแส × ความต้านทาน)", "V = I / R (แรงดัน = กระแส / ความต้านทาน)", "V = I + R (แรงดัน = กระแส + ความต้านทาน)", "V = R / I (แรงดัน = ความต้านทาน / กระแส)"], ans: 0 },
-                { q: "ในวงจรลอจิกดิจิทัลมาตรฐานแบบ TTL ระดับแรงดันของ Logic HIGH มีค่าประมาณเท่าใด?", options: ["2.0V ถึง 5.0V (Logic HIGH)", "0.0V ถึง 0.8V (Logic HIGH)", "12.0V ถึง 24.0V (Logic HIGH)", "110.0V ถึง 220.0V (Logic HIGH)"], ans: 0 },
-                { q: "ลอจิกเกต (Logic Gate) ชนิดใดให้ผลลัพธ์เป็น 1 (HIGH) เมื่ออินพุตทั้งหมดเป็น 1 (HIGH) เท่านั้น?", options: ["AND Gate (แอนด์เกต)", "OR Gate (ออร์เกต)", "NOT Gate (น็อตเกต)", "XOR Gate (เอ็กซ์ออร์เกต)"], ans: 0 },
-                { q: "หมายเลข IP Address รูปแบบ IPv4 ประกอบด้วยขนาดข้อมูลกี่บิต (Bits)?", options: ["32 บิต (4 อกเตต)", "64 บิต (8 อกเตต)", "128 บิต (16 อกเตต)", "16 บิต (2 อกเตต)"], ans: 0 },
-                { q: "ระบบจัดหมวดหมู่ IP Address แบบ IPv6 มีขนาดกี่บิต (Bits) เพื่อรองรับจำนวนอุปกรณ์ที่เพิ่มขึ้น?", options: ["128 บิต (16 อกเตต)", "64 บิต (8 อกเตต)", "256 บิต (32 อกเตต)", "32 บิต (4 อกเตต)"], ans: 0 },
-                { q: "สถาปัตยกรรมคอมพิวเตอร์แบบ Von Neumann ประกอบด้วยส่วนประกอบหลักใดบ้าง?", options: ["CPU, Memory, I/O Devices", "GPU, VRAM, Power Supply", "Display, Keyboard, Storage", "ALU, Control Unit, Register"], ans: 0 },
-                { q: "โปรโตคอล HTTPS ปลอดภัยกว่า HTTP แบบเดิมเนื่องจากมีการเข้ารหัสด้วยโปรโตคอลใด?", options: ["TLS / SSL (Transport Layer Security)", "SSH / FTP (Secure Shell Protocol)", "UDP / IP (User Datagram Protocol)", "DNS / DHCP (Domain Name System)"], ans: 0 },
-                { q: "โครงสร้างข้อมูล (Data Structure) แบบ Stack ทำงานด้วยหลักการใด?", options: ["LIFO (Last In, First Out)", "FIFO (First In, First Out)", "FILO (First In, Last Out)", "Random Access Allocation"], ans: 0 },
-                { q: "โครงสร้างข้อมูลแบบ Queue ทำงานด้วยหลักการใด?", options: ["FIFO (First In, First Out)", "LIFO (Last In, First Out)", "Priority Queue Allocation", "Direct Memory Access"], ans: 0 },
-                { q: "ลอจิกเกต NAND Gate เกิดจากการนำเกตใดมาต่อรวมกัน?", options: ["AND Gate ต่อรวมกับ NOT Gate", "OR Gate ต่อรวมกับ NOT Gate", "XOR Gate ต่อรวมกับ AND Gate", "NOR Gate ต่อรวมกับ OR Gate"], ans: 0 },
-                { q: "พอร์ตการสื่อสารมาตรฐาน (Port Number) ของโปรโตคอล HTTP คือพอร์ตใด?", options: ["Port 80 (HTTP Default)", "Port 443 (HTTPS Default)", "Port 21 (FTP Default)", "Port 22 (SSH Default)"], ans: 0 },
-                { q: "พอร์ตการสื่อสารมาตรฐานของโปรโตคอล HTTPS คือพอร์ตใด?", options: ["Port 443 (HTTPS Default)", "Port 80 (HTTP Default)", "Port 8080 (Proxy Default)", "Port 25 (SMTP Default)"], ans: 0 },
-                { q: "คำสั่งภาษา SQL ข้อใดใช้สำหรับการดึงข้อมูลออกจากฐานข้อมูล?", options: ["SELECT (ดึงข้อมูล)", "INSERT (เพิ่มข้อมูล)", "UPDATE (แก้ไขข้อมูล)", "DELETE (ลบข้อมูล)"], ans: 0 },
-                { q: "กระบวนการ \"Compilation\" ในการเขียนโปรแกรมหมายถึงสิ่งใด?", options: ["การแปลง Source Code เป็น Machine Code", "การตรวจสอบและค้นหา Bug ในโปรแกรม", "การติดตั้งไฟล์โปรแกรมลงในฮาร์ดดิสก์", "การจัดสรรพื้นที่หน่วยความจำให้โปรแกรม"], ans: 0 },
-                { q: "ในระบบปฏิบัติการ สภาวะ \"Deadlock\" คือสถานะแบบใด?", options: ["Process รอคอยทรัพยากรซึ่งกันและกันจนค้าง", "RAM เต็มจนระบบปฏิบัติการหยุดการทำงาน", "Hard Disk ชำรุดจนไม่สามารถอ่านไฟล์ได้", "สัญญาณ Clock เกิดความล่าช้ากว่ากำหนด"], ans: 0 },
-                { q: "หน้าที่หลักของ DNS Server (Domain Name System) คืออะไร?", options: ["การแปลงชื่อ Domain Name ให้เป็น IP Address", "การป้องกันและกรองผู้บุกรุกเข้าสู่ระบบเครือข่าย", "การจัดสรรหมายเลข IP Address ให้เครื่องลูกข่าย", "การจัดเก็บข้อมูลไฟล์บนเว็บไซต์ทั้งหมดไว้ในเซิร์ฟเวอร์"], ans: 0 },
-                { q: "หน่วยความจำ Cache ใน CPU มีหน้าที่สำคัญอย่างไร?", options: ["การบันทึกข้อมูลที่ใช้บ่อยเพื่อให้ CPU อ่านได้ไว", "การจัดเก็บไฟล์ภาพและวิดีโอที่มีขนาดใหญ่มาก", "การสำรองข้อมูลในวงจรเมื่อเกิดเหตุการณ์ไฟดับ", "การเชื่อมต่อสัญญาณข้อมูลกับอุปกรณ์ภายนอก"], ans: 0 },
-                { q: "อัลกอริทึมการเรียงลำดับแบบ \"Bubble Sort\" มี Time Complexity เฉลี่ยเป็นเท่าใด?", options: ["O(n²) (Quadratic Time)", "O(n log n) (Linearithmic Time)", "O(n) (Linear Time)", "O(1) (Constant Time)"], ans: 0 },
-                { q: "ข้อใดคือหน้าที่ของ MAC Address ในระบบเครือข่ายคอมพิวเตอร์?", options: ["หมายเลขอ้างอิงทางกายภาพของอุปกรณ์การ์ดเน็ตเวิร์ก (NIC)", "หมายเลขระบุตำแหน่งพิกัด GPS ของเครื่องคอมพิวเตอร์", "หมายเลขบัญชีผู้ใช้งานที่ลงทะเบียนในระบบปฏิบัติการ", "หมายเลขสุ่มชั่วคราวที่เปลี่ยนไปทุกครั้งที่เปิดเครื่องใหม่"], ans: 0 },
-                { q: "เทคโนโลยี Virtual Memory ในระบบปฏิบัติการ มีประโยชน์อย่างไร?", options: ["การใช้พื้นที่บางส่วนของ Disk จำลองเป็น RAM", "การเร่งความเร็วการ์ดจอให้ประมวลผลได้ดีขึ้น", "การจำลองระบบปฏิบัติการอื่นขึ้นมาเปิดใช้งาน", "การบีบอัดข้อมูลในหน่วยความจำหลักให้เพิ่มขึ้น"], ans: 0 },
-                { q: "ในทางอิเล็กทรอนิกส์ ตัวต้านทาน (Resistor) มีหน้าที่อะไรในวงจร?", options: ["การจำกัดและต่อต้านการไหลของกระแสไฟฟ้า", "การเก็บสะสมประจุไฟฟ้าเพื่อจ่ายในวงจร", "การแปลงสัญญาณกระแสสลับเป็นกระแสตรง", "การขยายความถี่และกำลังของสัญญาณไฟฟ้า"], ans: 0 },
-                { q: "วงจร Flip-Flop ในระบบดิจิทัลใช้ทำหน้าที่อะไรเป็นหลัก?", options: ["การเก็บบันทึกข้อมูลดิจิทัลขนาด 1 บิต", "การสลับทิศทางการไหลของกระแสไฟฟ้า", "การสร้างสัญญาณนาฬิกากำหนดจังหวะชิป", "การลดความต้านทานไฟฟ้าในวงจรอิเล็กทรอนิกส์"], ans: 0 },
-                { q: "ความแตกต่างหลักระหว่างโปรโตคอล TCP และ UDP คือข้อใด?", options: ["TCP เน้นความถูกต้อง ส่วน UDP เน้นความรวดเร็ว", "TCP ใช้ส่งข้อความ ส่วน UDP ใช้ส่งไฟล์ขนาดใหญ่", "TCP ทำงานไร้สาย ส่วน UDP ต้องเชื่อมสาย LAN", "TCP มีความปลอดภัยต่ำ ส่วน UDP มีความปลอดภัยสูง"], ans: 0 }
-            ],
-            hard: [
-                { q: "ในสถาปัตยกรรม CPU แบบ Pipelining ปรากฏการณ์ \"Data Hazard\" เกิดจากสาเหตุใด?", options: ["คำสั่งปัจจุบันต้องใช้ผลลัพธ์จากคำสั่งก่อนที่ยังประมวลผลไม่เสร็จ", "การทำนายทิศทางคำสั่งเงื่อนไข (Branch Prediction) เกิดความผิดพลาด", "เกิดความแออัดในการเข้าถึงบัสฮาร์ดแวร์หรือหน่วยความจำพร้อมกัน", "สัญญาณนาฬิกา (Clock Signal) เกิดการสูญเสียจังหวะซิงโครไนซ์"], ans: 0 },
-                { q: "ทฤษฎีบท CAP Theorem ในระบบ Distributed Database ระบุว่ารับประกันคุณสมบัติได้เพียง 2 ใน 3 ข้อ คือข้อใด?", options: ["Consistency, Availability, Partition Tolerance", "Concurrency, Accuracy, Performance Metric", "Capacity, Availability, Processing Control", "Control, Authentication, Protection Logic"], ans: 0 },
-                { q: "อัลกอริทึมการเข้ารหัสแบบ RSA (Asymmetric Encryption) อาศัยความยากทางคณิตศาสตร์เรื่องใดเป็นหลัก?", options: ["การแยกตัวประกอบจำนวนเฉพาะขนาดใหญ่ (Prime Factorization)", "การคำนวณดีเทอร์มิแนนต์ของเมทริกซ์เอกลักษณ์ (Matrix Determinant)", "การแปลงอนุกรมฟูเรียร์เชิงซ้อน (Complex Fourier Transform)", "การแก้สมการดิฟเฟอเรนเชียลอันดับสูง (Differential Equation)"], ans: 0 },
-                { q: "ในวิชา Computer Architecture เทคนิค \"Branch Prediction\" มีไว้เพื่อแก้ปัญหา Hazard ประเภทใด?", options: ["Control Hazard (Branch Hazard)", "Data Hazard (Read-After-Write)", "Structural Hazard (Resource Collision)", "Memory Hazard (Cache Miss Collision)"], ans: 0 },
-                { q: "กลไก \"Page Fault\" ในระบบ Virtual Memory เกิดขึ้นเมื่อใด?", options: ["CPU เรียกใช้ Memory Page ที่ยังไม่ได้ถูกโหลดขึ้น RAM จริง", "แผงหน่วยความจำ RAM เกิดความเสียหายทางกายภาพในวงจร", "โปรแกรมเขียนข้อมูลเกินขอบเขตโครงสร้างอาร์เรย์ (Array Overflow)", "เกิดไฟล์ขยะสะสมในระบบปฏิบัติการมากเกินเกณฑ์ที่กำหนด"], ans: 0 },
-                { q: "ข้อใดอธิบายหลักการของ ACID Properties ในระบบ Transactional Database ได้ถูกต้อง?", options: ["Atomicity, Consistency, Isolation, Durability", "Accuracy, Control, Integrity, Data Protection", "Access, Connection, Indexing, Deletion Logic", "Authentication, Cipher, Inspection, Defense Rules"], ans: 0 },
-                { q: "ทฤษฎีการสุ่มตัวอย่างของ Nyquist-Shannon ระบุว่าอัตราการสุ่มตัวอย่าง (Sampling Rate) ต้องเป็นอย่างไรเทียบกับความถี่สูงสุด (f_max)?", options: ["อย่างน้อย 2 เท่าของความถี่สูงสุด (2 × f_max)", "เท่ากับความถี่สูงสุดพอดี (1 × f_max)", "เป็นครึ่งหนึ่งของความถี่สูงสุด (0.5 × f_max)", "มากกว่า 10 เท่าของความถี่สูงสุด (10 × f_max)"], ans: 0 }
-            ]
-        };
-
-        let currentQuizQuestions = [];
-
-        function shuffleArray(arr) {
-            let array = [...arr];
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // 🎲 ฟังก์ชันสุ่มดึงข้อสอบ (ง่าย 5 ข้อ, ปานกลาง 3 ข้อ, ยาก 2 ข้อ รวม 10 ข้อ) พร้อมสลับช้อยส์
-        function prepareRandomQuestions() {
-            const easySample = shuffleArray(questionPool.easy).slice(0, 5);
-            const medSample = shuffleArray(questionPool.medium).slice(0, 3);
-            const hardSample = shuffleArray(questionPool.hard).slice(0, 2);
-
-            const selectedPool = [...easySample, ...medSample, ...hardSample];
-
-            currentQuizQuestions = selectedPool.map(qObj => {
-                let opts = qObj.options.map((opt, i) => ({ opt, isCorrect: i === qObj.ans }));
-                opts = shuffleArray(opts);
-                return {
-                    q: qObj.q,
-                    shuffledOptions: opts
-                };
-            });
-        }
-
-        const ballTargets = [
-            { id: 0, x: 10 * TILE_SIZE, y: 11 * TILE_SIZE, active: true },
-            { id: 1, x: 3 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 2, x: 8 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 3, x: 12 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 4, x: 16 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
-            { id: 5, x: 2 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 6, x: 6 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 7, x: 10 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 8, x: 14 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
-            { id: 9, x: 17 * TILE_SIZE, y: 3 * TILE_SIZE, active: true }
-        ];
-
-        const keys = { Up: false, Down: false, Left: false, Right: false };
-        let activeTarget = null;
-        let isQuizOpen = false;
-        let isGameStarted = false;
-        let isLBModalOpen = false;
-
-        // ================= VIRTUAL JOYSTICK =================
-        let joystickVector = { x: 0, y: 0 };
-        let isJoystickActive = false;
-        const joystickBase = document.getElementById('joystick-base');
-        const joystickStick = document.getElementById('joystick-stick');
-        const joystickContainer = document.getElementById('joystick-container');
-
-        function handleJoystickStart(clientX, clientY) {
-            if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
-            isJoystickActive = true;
-            updateJoystick(clientX, clientY);
-        }
-
-        function handleJoystickMove(clientX, clientY) {
-            if (!isJoystickActive) return;
-            updateJoystick(clientX, clientY);
-        }
-
-        function handleJoystickEnd() {
-            isJoystickActive = false;
-            joystickVector = { x: 0, y: 0 };
-            joystickStick.style.transform = `translate(0px, 0px)`;
-        }
-
-        function updateJoystick(clientX, clientY) {
-            const rect = joystickBase.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const maxRadius = (rect.width / 2) - 10;
-
-            let deltaX = clientX - centerX;
-            let deltaY = clientY - centerY;
-            let distance = Math.hypot(deltaX, deltaY);
-
-            if (distance > maxRadius) {
-                const angle = Math.atan2(deltaY, deltaX);
-                deltaX = Math.cos(angle) * maxRadius;
-                deltaY = Math.sin(angle) * maxRadius;
-            }
-
-            joystickStick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            joystickVector.x = deltaX / maxRadius;
-            joystickVector.y = deltaY / maxRadius;
-        }
-
-        joystickContainer.addEventListener('touchstart', e => {
-            e.preventDefault();
-            if (e.touches.length > 0) handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
-        });
-
-        window.addEventListener('touchmove', e => {
-            if (isJoystickActive && e.touches.length > 0) {
-                handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
-            }
-        });
-
-        window.addEventListener('touchend', () => handleJoystickEnd());
-
-        joystickContainer.addEventListener('mousedown', e => {
-            e.preventDefault();
-            handleJoystickStart(e.clientX, e.clientY);
-        });
-
-        window.addEventListener('mousemove', e => {
-            if (isJoystickActive) handleJoystickMove(e.clientX, e.clientY);
-        });
-
-        window.addEventListener('mouseup', () => handleJoystickEnd());
-
-        function resetKeys() {
-            keys.Up = false; keys.Down = false; keys.Left = false; keys.Right = false;
-            player.isMoving = false;
-            handleJoystickEnd();
-        }
-
-        window.addEventListener('keydown', e => handleKey(e.key, true));
-        window.addEventListener('keyup', e => handleKey(e.key, false));
-        window.addEventListener('blur', resetKeys);
-
-        function handleKey(key, isPressed) {
-            if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
-            if (key === 'ArrowUp' || key === 'w' || key === 'W') keys.Up = isPressed;
-            if (key === 'ArrowDown' || key === 's' || key === 'S') keys.Down = isPressed;
-            if (key === 'ArrowLeft' || key === 'a' || key === 'A') keys.Left = isPressed;
-            if (key === 'ArrowRight' || key === 'd' || key === 'D') keys.Right = isPressed;
-        }
-
-        // ================= LEADERBOARD MODALS =================
-        function openLBModal() {
-            isLBModalOpen = true;
-            resetKeys();
-            if (window.fetchAndRenderLeaderboard) {
-                window.fetchAndRenderLeaderboard('lb-view-body');
-            }
-            document.getElementById('lb-view-modal').style.display = 'flex';
-        }
-
-        function closeLBModal() {
-            document.getElementById('lb-view-modal').style.display = 'none';
-            isLBModalOpen = false;
-        }
-
-        function startGame() {
-            if (checkPlayRestriction()) return;
-
-            prepareRandomQuestions();
-
-            document.getElementById('player-disp-name').innerText = playerName;
-            document.getElementById('start-modal').style.display = 'none';
-
-            isGameStarted = true;
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
-        }
-
-        function updateTimer() {
-            if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
-            elapsedTimeInSec = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timer-disp').innerText = `⏱️ ${formatTimeStr(elapsedTimeInSec)}`;
-        }
-
-        // ================= PLAYER MOVEMENT & COLLISION =================
-        function updatePlayer() {
-            if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
-
-            let dx = 0; let dy = 0;
-
-            if (keys.Up) dy -= 1;
-            if (keys.Down) dy += 1;
-            if (keys.Left) dx -= 1;
-            if (keys.Right) dx += 1;
-
-            if (dx !== 0 && dy !== 0) {
-                dx *= 0.7071;
-                dy *= 0.7071;
-            }
-
-            if (isJoystickActive) {
-                dx = joystickVector.x;
-                dy = joystickVector.y;
-            }
-
-            player.isMoving = (dx !== 0 || dy !== 0);
-
-            let nextX = player.x + dx * player.speed;
-            let nextY = player.y + dy * player.speed;
-
-            // Wall Collision Boundaries
-            const wallTopY = 9.0 * TILE_SIZE;     
-            const wallBottomY = 11.0 * TILE_SIZE;  
-            const gateLeftX = 8.8 * TILE_SIZE;    
-            const gateRightX = 11.2 * TILE_SIZE;  
-
-            let boxNextX = { left: nextX, right: nextX + player.width, top: player.y, bottom: player.y + player.height };
-            if (boxNextX.bottom > wallTopY && boxNextX.top < wallBottomY) {
-                if (boxNextX.left < gateLeftX) {
-                    if (player.x >= gateLeftX) nextX = gateLeftX;
-                }
-                if (boxNextX.right > gateRightX) {
-                    if (player.x + player.width <= gateRightX) nextX = gateRightX - player.width;
-                }
-            }
-
-            let boxNextY = { left: nextX, right: nextX + player.width, top: nextY, bottom: nextY + player.height };
-            if (boxNextY.bottom > wallTopY && boxNextY.top < wallBottomY) {
-                if (boxNextY.left < gateLeftX || boxNextY.right > gateRightX) {
-                    if (dy > 0 && player.y + player.height <= wallTopY) {
-                        nextY = wallTopY - player.height;
-                    } else if (dy < 0 && player.y >= wallBottomY) {
-                        nextY = wallBottomY;
-                    }
-                }
-            }
-
-            player.x = Math.max(TILE_SIZE, Math.min(canvas.width - TILE_SIZE - player.width, nextX));
-            player.y = Math.max(TILE_SIZE, Math.min(canvas.height - TILE_SIZE - player.height, nextY));
-
-            // Collision Check with Soccer Balls
-            ballTargets.forEach(ball => {
-                if (ball.active && !isQuizOpen && !isLBModalOpen) {
-                    const dist = Math.hypot((player.x + 12) - (ball.x + 16), (player.y + 12) - (ball.y + 16));
-                    if (dist < 22) {
-                        triggerQuiz(ball);
-                    }
-                }
-            });
-        }
-
-        function triggerQuiz(ball) {
-            if (isQuizOpen || isLBModalOpen) return;
-
-            resetKeys();
-            isQuizOpen = true;
-            activeTarget = ball;
-            
-            const q = currentQuizQuestions[ball.id];
-
-            document.getElementById('quiz-gate-num').innerText = `FOOTBALL MISSION #${ball.id + 1}`;
-            document.getElementById('quiz-question').innerText = q.q;
-            
-            const feedback = document.getElementById('quiz-feedback');
-            feedback.style.display = 'none';
-            feedback.innerText = '';
-
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = '';
-
-            q.shuffledOptions.forEach((item, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'quiz-btn';
-                btn.dataset.correct = item.isCorrect;
-                btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}.</strong>&nbsp; ${item.opt}`;
-                btn.onclick = () => handleAnswer(item.isCorrect, btn);
-                optionsContainer.appendChild(btn);
-            });
-
-            document.getElementById('quiz-modal').style.display = 'flex';
-        }
-
-        function handleAnswer(isCorrect, selectedBtn) {
-            const feedback = document.getElementById('quiz-feedback');
-            const optionBtns = document.querySelectorAll('.quiz-btn');
-
-            optionBtns.forEach(btn => {
-                btn.disabled = true;
-                if (btn.dataset.correct === "true") {
-                    btn.classList.add('correct-ans');
-                }
-            });
-
-            if (!isCorrect && selectedBtn) {
-                selectedBtn.classList.add('wrong-ans');
-            }
-
-            activeTarget.active = false;
-            feedback.style.display = 'inline-block';
-
-            if (isCorrect) {
-                feedback.className = 'feedback-msg feedback-success';
-                feedback.innerHTML = '🎉 ตอบถูกต้อง! (+1 คะแนน)';
-                ballsPassed++;
-            } else {
-                feedback.className = 'feedback-msg feedback-error';
-                feedback.innerHTML = '❌ ตอบผิด!';
-            }
-
-            setTimeout(() => {
-                document.getElementById('keys-text').innerText = `⚽ ${ballsPassed}/10`;
-                document.getElementById('quiz-modal').style.display = 'none';
-                resetKeys();
-                isQuizOpen = false;
-
-                const remainingBalls = ballTargets.filter(b => b.active).length;
-                if (remainingBalls === 0) {
-                    finishGame();
-                }
-            }, 1400);
-        }
-
-        function finishGame() {
-            clearInterval(timerInterval);
-            localStorage.setItem("cpe_quiz_played", "true");
-
-            document.getElementById('win-summary').innerText = `คุณ ${playerName} ทำคะแนนได้ ${ballsPassed}/10 ข้อ | เวลา ${formatTimeStr(elapsedTimeInSec)}`;
-            
-            if (window.saveScoreToCloud) window.saveScoreToCloud(playerName, playerSchool, ballsPassed, elapsedTimeInSec);
-            if (window.fetchAndRenderLeaderboard) window.fetchAndRenderLeaderboard('leaderboard-body');
-            document.getElementById('win-modal').style.display = 'flex';
-        }
-
-        // ================= RENDER SPRITES & WORLD =================
-        function drawPixelMatrix(matrix, colorMap, startX, startY, pSize = 2) {
-            for (let r = 0; r < matrix.length; r++) {
-                for (let c = 0; c < matrix[r].length; c++) {
-                    const char = matrix[r][c];
-                    if (char !== '.' && colorMap[char]) {
-                        ctx.fillStyle = colorMap[char];
-                        ctx.fillRect(startX + (c * pSize), startY + (r * pSize), pSize, pSize);
-                    }
-                }
-            }
-        }
-
-        const CONE_MATRIX = [
-            ".......KK.......", "......KLLK......", "......KODK......", ".....KWWWWK.....",
-            ".....KSSWSK.....", ".....KLLODK.....", "....KWWWWWWK....", "....KSSSWWSK....",
-            "....KLLLLODK....", "...KLLLLLODDK...", "..KKKKLLLLODDKK.", ".KLLLLLLLLODDDK.",
-            "KLLLLLLLLLODDDDK", "KLLLLLLLLLODDDDK", "KLLLLLLLLLODDDDK", ".KKKKKKKKKKKKKK."
-        ];
-        const CONE_COLORS = { 'K': '#18181b', 'L': '#fb923c', 'O': '#f97316', 'D': '#ea580c', 'W': '#ffffff', 'S': '#cbd5e1' };
-
-        const TREE_MATRIX = [
-            ".....KKKKK.....", "...KKGGGGGKK...", "..KGGGRGGGGGK..", ".KGGGGGGGGRGGK.",
-            ".KRGGGGGGGGGGK.", ".KGGGRGGGGGRGK.", ".KGGGGGGGGGGGK.", "..KGGGGGGGGGK..",
-            "...KKKKTTTKKK..", ".....KTTTK.....", ".....KTTTK.....", ".....KTTTK.....",
-            "....KTTTTTK....", "....KKKKKKK...."
-        ];
-        const TREE_COLORS = { 'K': '#1f2937', 'G': '#10b981', 'R': '#f43f5e', 'T': '#f97316' };
-
-        function drawAngledShadow(x, y, width, height, opacity = 0.35) {
-            ctx.save();
-            ctx.fillStyle = `rgba(15, 23, 42, ${opacity})`;
-            ctx.beginPath();
-            ctx.ellipse(x - 8, y + 6, width, height / 2, -Math.PI / 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-
-        function draw3DFootball(ball) {
-            const hoverY = Math.sin((animFrame + ball.id * 8) * 0.1) * 3.5;
-            const bx = ball.x + 16;
-            const by = ball.y + 16 + hoverY;
-            const radius = 14;
-
-            let pinColor = '#f97316';
-            let baseColor1 = '#ffffff';
-            let baseColor2 = '#e2e8f0';
-            let spotColor = '#0f172a';
-
-            if (ball.id >= 5 && ball.id <= 8) {
-                pinColor = '#eab308';
-                baseColor1 = '#fef08a';
-                baseColor2 = '#eab308';
-                spotColor = '#18181b';
-            } else if (ball.id === 9) {
-                pinColor = '#ef4444';
-                baseColor1 = '#fca5a5';
-                baseColor2 = '#dc2626';
-                spotColor = '#18181b';
-            }
-
-            ctx.fillStyle = pinColor;
-            ctx.beginPath();
-            ctx.moveTo(bx - 7, by - 24);
-            ctx.lineTo(bx + 7, by - 24);
-            ctx.lineTo(bx, by - 16);
-            ctx.closePath();
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            drawAngledShadow(bx, ball.y + 26, 15, 8, 0.4);
-
-            const ballGrad = ctx.createRadialGradient(bx + 5, by - 6, 2, bx, by, radius);
-            ballGrad.addColorStop(0, '#ffffff');
-            ballGrad.addColorStop(0.5, baseColor1);
-            ballGrad.addColorStop(1, baseColor2);
-
-            ctx.fillStyle = ballGrad;
-            ctx.beginPath();
-            ctx.arc(bx, by, radius, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = spotColor;
-            ctx.beginPath(); ctx.arc(bx, by, 4.2, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(bx - 10, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(bx + 10, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(bx, by + 10, 3.2, 0, Math.PI * 2); ctx.fill();
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-            ctx.beginPath();
-            ctx.arc(bx + 4, by - 6, 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.strokeStyle = '#020617';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(bx, by, radius, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-
-        function drawSchoolWallAndGate() {
-            const wallY = 9.2 * TILE_SIZE;
-
-            const treePositions = [1, 3, 5, 13, 15, 17, 19];
-            treePositions.forEach(tx => {
-                const wx = tx * TILE_SIZE - 4;
-                const wy = wallY - 26;
-                drawAngledShadow(wx + 16, wy + 28, 16, 8, 0.3);
-                drawPixelMatrix(TREE_MATRIX, TREE_COLORS, wx, wy, 2.2);
-            });
-
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 2;
-            for (let x = 0; x < canvas.width; x += 16) {
-                if (x >= 7.5 * TILE_SIZE && x <= 11.5 * TILE_SIZE) continue;
-                ctx.beginPath();
-                ctx.arc(x + 8, wallY - 2, 5, Math.PI, 0);
-                ctx.stroke();
-                ctx.fillRect(x + 7, wallY - 2, 2, 10);
-            }
-
-            const drawBrickSection = (startX, endX) => {
-                ctx.fillStyle = '#f1f5f9';
-                ctx.fillRect(startX, wallY + 8, endX - startX, 4);
-                ctx.fillStyle = '#cbd5e1';
-                ctx.fillRect(startX, wallY + 12, endX - startX, 6);
-
-                const brickH = 8;
-                const brickW = 16;
-                ctx.fillStyle = '#ef4444';
-                ctx.fillRect(startX, wallY + 18, endX - startX, 2 * TILE_SIZE);
-
-                ctx.strokeStyle = '#fef2f2';
-                ctx.lineWidth = 1;
-                for (let y = wallY + 18; y < wallY + 18 + 2 * TILE_SIZE; y += brickH) {
-                    ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
-                    const offset = (Math.floor((y - wallY) / brickH) % 2) * (brickW / 2);
-                    for (let x = startX + offset; x < endX; x += brickW) {
-                        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + brickH); ctx.stroke();
-                    }
-                }
-
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
-                ctx.fillRect(startX, wallY + 18 + 2 * TILE_SIZE, endX - startX, 14);
-            };
-
-            drawBrickSection(0, 7.5 * TILE_SIZE);
-            drawBrickSection(11.2 * TILE_SIZE, canvas.width);
-
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(7.5 * TILE_SIZE, wallY, 3.7 * TILE_SIZE, 2.8 * TILE_SIZE);
-
-            const ghX = 7.2 * TILE_SIZE;
-            const ghY = wallY - 6;
-
-            drawAngledShadow(ghX + 35, ghY + 55, 38, 12, 0.4);
-
-            ctx.fillStyle = '#fecdd3';
-            ctx.fillRect(ghX, ghY + 10, 2.2 * TILE_SIZE, 1.8 * TILE_SIZE);
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(ghX, ghY + 10, 2.2 * TILE_SIZE, 1.8 * TILE_SIZE);
-
-            const roofGrad = ctx.createLinearGradient(ghX, ghY, ghX, ghY + 10);
-            roofGrad.addColorStop(0, '#f97316');
-            roofGrad.addColorStop(1, '#ea580c');
-            ctx.fillStyle = roofGrad;
-            ctx.beginPath();
-            ctx.roundRect(ghX - 3, ghY, 2.5 * TILE_SIZE, 10, [4, 4, 2, 2]);
-            ctx.fill();
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(ghX + 6, ghY + 16, 58, 26);
-            ctx.fillStyle = '#fed7aa';
-            ctx.fillRect(ghX + 10, ghY + 19, 22, 20);
-            ctx.fillRect(ghX + 38, ghY + 19, 22, 20);
-
-            const gateX = 11.2 * TILE_SIZE;
-            const gateY = wallY + 8;
-
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(gateX - 8, gateY + 12, 16, 36);
-
-            ctx.fillStyle = '#22c55e';
-            ctx.beginPath(); ctx.arc(gateX, gateY + 38, 5, 0, Math.PI * 2); ctx.fill();
-
-            for (let i = 0; i < 40; i += 8) {
-                ctx.fillStyle = (i / 8) % 2 === 0 ? '#ef4444' : '#ffffff';
-                ctx.fillRect(gateX - 4, gateY - i + 10, 8, 8);
-            }
-        }
-
-        function drawGrayAsphaltRoadTile(x, y) {
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.fillRect(x + 2, y + 2, 6, 4);
-        }
-
-        function drawGrassPitchTile(x, y, col) {
-            ctx.fillStyle = col % 2 === 0 ? '#16a34a' : '#15803d';
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            ctx.fillStyle = col % 2 === 0 ? '#22c55e' : '#166534';
-            ctx.fillRect(x + 4, y + 6, 2, 4);
-            ctx.fillRect(x + 18, y + 20, 2, 4);
-        }
-
-        function drawFieldChalkLines(r, c, x, y) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            if (r === 1) ctx.fillRect(x, y + 4, TILE_SIZE, 2);
-            if (r === 8) ctx.fillRect(x, y + 28, TILE_SIZE, 2);
-            if (c === 1) ctx.fillRect(x + 4, y, 2, TILE_SIZE);
-            if (c === 18) ctx.fillRect(x + 26, y, 2, TILE_SIZE);
-        }
-
-        function drawTrafficCone(x, y) {
-            drawAngledShadow(x + 16, y + 28, 14, 6, 0.4);
-            drawPixelMatrix(CONE_MATRIX, CONE_COLORS, x, y, 2);
-        }
-
-        function drawPlayerCharacter() {
-            const px = player.x;
-            const py = player.y;
-            const walkOffset = player.isMoving ? Math.sin(animFrame * 0.2) * 2 : 0;
-
-            drawAngledShadow(px + 12, py + 26, 12, 6, 0.45);
-
-            ctx.fillStyle = '#facc15';
-            ctx.fillRect(px + 2, py - 2 + walkOffset, 20, 10);
-
-            ctx.fillStyle = '#fde047';
-            ctx.fillRect(px + 4, py + 4 + walkOffset, 16, 8);
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(px + 6, py + 6 + walkOffset, 3, 4);
-            ctx.fillRect(px + 15, py + 6 + walkOffset, 3, 4);
-
-            ctx.fillStyle = '#f97316';
-            ctx.fillRect(px + 4, py + 12 + walkOffset, 16, 10);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(px + 4, py + 22, 6, 6);
-            ctx.fillRect(px + 14, py + 22, 6, 6);
-
-            ctx.font = 'bold 11px Kanit, sans-serif';
-            const textMetrics = ctx.measureText(playerName);
-            const textWidth = textMetrics.width;
-
-            const paddingX = 14;
-            const tagWidth = textWidth + paddingX;
-            const tagHeight = 18;
-            const centerX = px + 12;
-            const tagX = centerX - (tagWidth / 2);
-            const tagY = py - 24;
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-            ctx.beginPath();
-            if (ctx.roundRect) {
-                ctx.roundRect(tagX, tagY, tagWidth, tagHeight, 5);
-            } else {
-                ctx.rect(tagX, tagY, tagWidth, tagHeight);
-            }
-            ctx.fill();
-
-            ctx.strokeStyle = '#f97316';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            ctx.fillStyle = '#ea580c';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(playerName, centerX, tagY + (tagHeight / 2));
-            ctx.textBaseline = 'alphabetic';
-        }
-
-        function drawSunlightAtmosphere() {
-            const sunX = canvas.width * 0.85;
-            const sunY = -40;
-
-            const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, canvas.width * 1.1);
-            sunGrad.addColorStop(0, 'rgba(255, 230, 150, 0.22)');
-            sunGrad.addColorStop(0.5, 'rgba(255, 180, 80, 0.08)');
-            sunGrad.addColorStop(1, 'rgba(0, 0, 0, 0.12)');
-
-            ctx.fillStyle = sunGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'lighter';
-            ctx.fillStyle = 'rgba(255, 220, 140, 0.04)';
-            
-            ctx.beginPath();
-            ctx.moveTo(sunX, sunY);
-            ctx.lineTo(sunX - 350, canvas.height);
-            ctx.lineTo(sunX - 180, canvas.height);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(sunX, sunY);
-            ctx.lineTo(sunX - 620, canvas.height);
-            ctx.lineTo(sunX - 450, canvas.height);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-
-            const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.35, canvas.width / 2, canvas.height / 2, canvas.width * 0.7);
-            vig.addColorStop(0, 'rgba(0,0,0,0)');
-            vig.addColorStop(1, 'rgba(2, 6, 23, 0.45)');
-            ctx.fillStyle = vig;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function render() {
-            animFrame++;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Pitch
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < MAP_WIDTH; c++) {
-                    drawGrassPitchTile(c * TILE_SIZE, r * TILE_SIZE, c);
-                    drawFieldChalkLines(r, c, c * TILE_SIZE, r * TILE_SIZE);
-                }
-            }
-
-            // Wall
-            drawSchoolWallAndGate();
-
-            // Road
-            for (let r = 11; r < MAP_HEIGHT; r++) {
-                for (let c = 0; c < MAP_WIDTH; c++) {
-                    drawGrayAsphaltRoadTile(c * TILE_SIZE, r * TILE_SIZE);
-                }
-            }
-
-            // Cones
-            for (let r = 11; r < 16; r++) {
-                drawTrafficCone(6 * TILE_SIZE, r * TILE_SIZE);
-                drawTrafficCone(13 * TILE_SIZE, r * TILE_SIZE);
-            }
-
-            // Balls
-            ballTargets.forEach(ball => {
-                if (ball.active) draw3DFootball(ball);
-            });
-
-            // Player & Lighting
-            drawPlayerCharacter();
-            drawSunlightAtmosphere();
-        }
-
-        function gameLoop() {
-            updatePlayer();
-            render();
-            requestAnimationFrame(gameLoop);
-        }
-
-        requestAnimationFrame(gameLoop);
+              function checkPlayRestriction() {
+                  const hasPlayed = localStorage.getItem("cpe_quiz_played") === "true";
+                  const startBtn = document.getElementById('btn-start-game');
+                  const warningBox = document.getElementById('played-warning-box');
+
+                  if (hasPlayed) {
+                      if (startBtn) {
+                          startBtn.disabled = true;
+                          startBtn.innerHTML = "❌ ทำแบบทดสอบไปแล้ว";
+                      }
+                      if (warningBox) {
+                          warningBox.style.display = "block";
+                      }
+                      return true;
+                  }
+                  return false;
+              }
+
+              function openAdminModal() {
+                  const input = document.getElementById('admin-pass-input');
+                  const err = document.getElementById('admin-pass-error');
+                  input.value = '';
+                  err.innerText = '';
+                  document.getElementById('admin-modal').style.display = 'flex';
+                  setTimeout(() => input.focus(), 100);
+              }
+
+              function closeAdminModal() {
+                  document.getElementById('admin-modal').style.display = 'none';
+              }
+
+              function checkAdminPassword() {
+                  const input = document.getElementById('admin-pass-input');
+                  const err = document.getElementById('admin-pass-error');
+
+                  if (input.value === "cpe69231") {
+                      window.location.href = "resetboard.html";
+                  } else {
+                      err.innerText = "❌ รหัสผ่านไม่ถูกต้อง!";
+                      input.value = '';
+                      input.focus();
+                  }
+              }
+
+              function handleAdminInputKey(e) {
+                  if (e.key === 'Enter') {
+                      checkAdminPassword();
+                  }
+              }
+
+              function formatTimeStr(sec) {
+                  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+                  const s = String(sec % 60).padStart(2, '0');
+                  return `${m}:${s}`;
+              }
+
+              // ================= GAME ENGINE =================
+              const canvas = document.getElementById('gameCanvas');
+              const ctx = canvas.getContext('2d');
+
+              const TILE_SIZE = 32;
+              const MAP_WIDTH = 20;  // 640px
+              const MAP_HEIGHT = 16; // 512px
+
+              canvas.width = MAP_WIDTH * TILE_SIZE;
+              canvas.height = MAP_HEIGHT * TILE_SIZE;
+
+              let playerName = "ผู้เยี่ยมชม";
+              let playerSchool = "";
+              let ballsPassed = 0;
+              let animFrame = 0;
+
+              let startTime = 0;
+              let timerInterval = null;
+              let elapsedTimeInSec = 0;
+
+              function loadLoggedInUser() {
+                  const fname = localStorage.getItem("cpe_firstname") || "";
+                  const lname = localStorage.getItem("cpe_lastname") || "";
+                  playerSchool = localStorage.getItem("cpe_school") || "";
+
+                  if (fname !== "") {
+                      playerName = (fname + " " + lname).trim();
+                  } else {
+                      playerName = "ผู้เยี่ยมชม";
+                  }
+
+                  const dispName = document.getElementById('disp-player-name');
+                  if (dispName) dispName.innerText = playerName;
+
+                  const dispPlayerHud = document.getElementById('player-disp-name');
+                  if (dispPlayerHud) dispPlayerHud.innerText = playerName;
+
+                  const dispSchool = document.getElementById('disp-player-school');
+                  if (dispSchool) {
+                      dispSchool.innerText = playerSchool ? `🏫 ${playerSchool}` : "🏫 ไม่ระบุสังกัด";
+                  }
+
+                  checkPlayRestriction();
+              }
+
+              window.addEventListener("DOMContentLoaded", () => {
+                  loadLoggedInUser();
+              });
+
+              const player = {
+                  x: 10 * TILE_SIZE,
+                  y: 13 * TILE_SIZE,
+                  width: 24,
+                  height: 24,
+                  speed: 2.4,
+                  isMoving: false
+              };
+
+              // ================= 📚 คลังคำถาม 60 ข้อ (ไร้คำใบ้ในวงเล็บ 100%) =================
+              const questionPool = {
+                  easy: [
+                      { q: "หากเปรียบระดับสัญญาณดิจิทัล 0 และ 1 ในคอมพิวเตอร์กับสิ่งของในชีวิตประจำวัน สิ่งใดตรงที่สุด?", options: ["สวิตช์ไฟแบบกดเปิดหรือกดปิด", "ระดับความซิ่งของแว้นจากหนึ่งถึงร้อย", "ประตูบ้านที่เปิดค้างไว้ครึ่งๆ กลางๆ", "ความรักที่เธอให้มาแบบครึ่งๆ กลางๆ"], ans: 0 },
+                      { q: "เมื่อคอมค้าง แล้วมีคนบอก 'ลองกด Restart ดูดิ' จริงๆ แล้วมันช่วยแก้ปัญหาจากอะไร?", options: ["ล้างข้อมูลชั่วคราวในแรมที่ค้างอยู่ให้ใสสะอาด", "ไล่ผีที่สิงอยู่ในเคสคอมพิวเตอร์ออกไป", "ช่วยให้ซีพียูหายเหนื่อยจากการวิ่งรอก", "เพิ่มแรงดันไฟให้พัดลมหมุนแรงขึ้น 10 เท่า"], ans: 0 },
+                      { q: "คำว่า Bug ที่ใช้เรียกข้อผิดพลาดในโปรแกรมคอมพิวเตอร์ มีที่มาจากเหตุการณ์ใด?", options: ["แมลงชีปะขาวบินติดในเครื่องคำนวณยุคโบราณ", "ยุงกัดโปรแกรมเมอร์จนพิมพ์โค้ดผิด", "ปลวกแอบกินสายแลนหลังห้องแล็บ", "พี่ตูนบอกให้ก้าวไปข้างหน้าแต่บั๊กก้าวถอยหลัง"], ans: 0 },
+                      { q: "ปุ่ม Ctrl + Z บนคีย์บอร์ด เปรียบเสมือนเครื่องมืออะไรในชีวิตจริง?", options: ["การย้อนกลับการทำงานล่าสุด", "การย้อนเวลากลับไปจีบเธอใหม่อีกครั้ง", "การลบประวัติการเข้าเว็บตอนห้าทุ่มทิ้ง", "การกดพับหน้าจอหลบแม่ให้ไวที่สุด"], ans: 0 },
+                      { q: "อุปกรณ์ชิ้นไหนในคอมพิวเตอร์ที่ทำหน้าที่เป็นสมอง คอยคิดและประมวลผล?", options: ["หน่วยประมวลผลกลางซีพียู", "แรมความจำสั้น", "พัดลมระบายอากาศ", "กล่องเคสคอมพิวเตอร์"], ans: 0 },
+                      { q: "แรม กับ ฮาร์ดดิสก์ ต่างกันยังไงแบบเข้าใจง่ายที่สุด?", options: ["แรมจำแป๊บๆ ดับไฟก็ลืม ส่วนฮาร์ดดิสก์จำฝังใจดับไฟก็ยังอยู่", "แรมไว้เล่นเกม ส่วนฮาร์ดดิสก์ไว้โหลดอนิเมะ", "แรมเป็นของกิน ส่วนฮาร์ดดิสก์เป็นของใช้", "แรมทำงานช้าเหมือนเต่า ส่วนฮาร์ดดิสก์เร็วเหมือนแสง"], ans: 0 },
+                      { q: "สิ่งใดต่อไปนี้ไม่ใช่ระบบปฏิบัติการ แต่เป็นแค่แอปท่องเว็บ?", options: ["กูเกิลโครม", "วินโดวส์ 11", "ลีนุกซ์ อูบุนตุ", "แมคโอเอส"], ans: 0 },
+                      { q: "โดน ฟิชชิ่ง ในโลกไอที หมายถึงพฤติกรรมสุดซวยแบบใด?", options: ["โดนเว็บปลอมหลอกเอาไอดีและรหัสผ่าน", "โดนตกปลาสดๆ กลางแม่น้ำเจ้าพระยา", "โดนเพื่อนตกให้ไปกดซื้อเกมในสตรีม", "โดนปล่อยไวรัสกัดสายไฟจนขาด"], ans: 0 },
+                      { q: "เมื่อกดล้างถังขยะในคอมพิวเตอร์ ข้อมูลไฟล์นั้นจะเกิดอะไรขึ้น?", options: ["ลบดัชนีชี้ตำแหน่งไฟล์ เพื่อเตรียมโดนเขียนทับ", "ไฟล์บินขึ้นสวรรค์ไปหาเทพเจ้าไอที", "บีบอัดไปซ่อนไว้ใต้หลังคาบ้าน", "ส่งตรงไปเข้าเครื่องมอนิเตอร์ของตำรวจ"], ans: 0 },
+                      { q: "โหมดท่องเว็บแบบส่วนตัว จริงๆ แล้วป้องกันอะไร?", options: ["ไม่บันทึกประวัติการท่องเว็บในเครื่องเรา", "ลบตัวตนเราออกจากโลกใบนี้ทันที", "ป้องกันไวรัสทุกชนิดในจักรวาล", "ซ่อนเครื่องเราให้บินได้เหมือนเครื่องบินล่องหน"], ans: 0 },
+                      { q: "ชื่อเทคโนโลยีเชื่อมต่อไร้สาย บลูทูธ มีที่มาจากอะไร?", options: ["ฉายากษัตริย์ไวกิ้งในอดีต", "หมอไอทียุคแรกกินบลูเบอร์รีจนฟันเปลี่ยนสี", "ฉลามฟันสีฟ้าในมหาสมุทรแปซิฟิก", "ยี่ห้อหมากฝรั่งรสเย็นสุดขั้ว"], ans: 0 },
+                      { q: "ทำไมสายแลนถึงต้องพันตีเกลียวเป็นคู่ๆ เหมือนเส้นมาม่า?", options: ["ลดสัญญาณรบกวนข้ามสาย", "เอาไว้ถอดออกมาผูกเชือกรองเท้าเวลาสายขาด", "ทำให้สายดูนุ่มนวลน่าจับมากขึ้นเฉยๆ", "ประหยัดพื้นที่กล่องเก็บสาย"], ans: 0 },
+                      { q: "คำว่า คลาวด์ สตอเรจ หมายถึงอะไรในโลกไอที?", options: ["การฝากไฟล์ไว้บนเซิร์ฟเวอร์ผ่านอินเทอร์เน็ต", "การเอาแฟลชไดรฟ์ไปตากแดดให้แห้ง", "การส่งข้อมูลผ่านละอองน้ำในอากาศ", "การบันทึกข้อมูลลงชิปดาวเทียม"], ans: 0 },
+                      { q: "ระบบที่ชอบให้เรากดเลือกไฟจราจรหรือทางข้ามม้าลายก่อนเข้าเว็บ มีไว้ทำไม?", options: ["แยกแยะว่าเราเป็นคนจริงๆ ไม่ใช่บอท", "ทดสอบสายตาว่าสั้นกี่ร้อย", "ฝึกทักษะการขับรถกู้ภัย", "กวนประสาทผู้ใช้ก่อนเข้าเว็บเฉยๆ"], ans: 0 },
+                      { q: "การตั้งรหัสผ่านแบบไหนที่แฮกเกอร์เห็นแล้วท้อ ปลอดภัยที่สุด?", options: ["ผสมมั่วทั้งตัวพิมพ์ใหญ่ ตัวเล็ก ตัวเลข และสัญลักษณ์", "ตัวเลขเรียงกันจากหนึ่งถึงแปด", "คำว่าแอดมินตัวเดียวจบ", "วันเดือนปีเกิดตัวเองชิลๆ"], ans: 0 },
+                      { q: "ปุ่ม F5 บนคีย์บอร์ดตอนเปิดเว็บอยู่ มีไว้ทำอะไร?", options: ["โหลดหน้าเว็บปัจจุบันใหม่อีกครั้ง", "วาร์ปไปหน้าต่างต่อไปทันที", "ระเบิดเครื่องตัวเองทิ้ง", "สลับไปเล่นเกมทันที"], ans: 0 },
+                      { q: "มัลแวร์สายโหด แรนซอมแวร์ มีพฤติกรรมสุดแสบยังไง?", options: ["ล็อกไฟล์ทั้งหมดในเครื่องแล้วขู่เรียกค่าไถ่", "แอบเปิดเพลงตื๊ดๆ ตอนตีสามให้ตกใจ", "ลบรูปแฟนเก่าทิ้งให้อัตโนมัติ", "สั่งพัดลมหมุนแรงจนเคสลอยได้"], ans: 0 },
+                      { q: "นามสกุลไฟล์เอกสารยอดฮิต .pdf ย่อมาจากอะไร?", options: ["Portable Document Format", "Please Don't Fly", "Program Data File", "Paper Document Print"], ans: 0 },
+                      { q: "ซื้อแฟลชไดรฟ์ 16GB มา เสียบคอมเห็นความจุแค่ประมาณ 14.8GB เกิดจากอะไร?", options: ["คอมพิวเตอร์นับฐานสอง แต่ผู้ผลิตนับฐานสิบ", "คนขายแอบกั๊กพื้นที่ไว้ใส่วิดีโอส่วนตัว", "พื้นที่โดนไวรัสแดกไปเรียบร้อยแล้ว", "ความจุหดตัวเพราะอากาศเมืองไทยมันร้อน"], ans: 0 },
+                      { q: "การ์ดจอ หรือ จีพียู เน้นทำหน้าที่ด้านไหนเป็นหลัก?", options: ["ประมวลผลภาพ กราฟิก และเกมสามมิติ", "เน้นการเปิดเพลงฟังเพลินๆ", "เน้นหาพิกัดร้านหมูกระทะใกล้บ้าน", "เน้นเร่งกระแสไฟฟ้าในเครื่อง"], ans: 0 },
+                      { q: "อาการจอฟ้าในตำนาน เกิดจากสาเหตุใด?", options: ["ข้อผิดพลาดร้ายแรงของระบบปฏิบัติการหรือฮาร์ดแวร์", "คอมพิวเตอร์กำลังเปลี่ยนวอลเปเปอร์เป็นสีฟ้าสบายตา", "จอภาพพังจนแสดงได้แค่สีฟ้าสีเดียว", "อินเทอร์เน็ตแรงเกินไปจนเครื่องรับไม่ทัน"], ans: 0 },
+                      { q: "เปิดเว็บแล้วเจอตัวเลข 404 Not Found มันหมายความว่ายังไง?", options: ["ไม่พบหน้าเว็บนั้นบนระบบเซิร์ฟเวอร์", "รหัสผ่านผิด ให้ลองใหม่ชาติหน้า", "อินเทอร์เน็ตถูกตัดเนื่องจากลืมจ่ายค่าบริการ", "เซิร์ฟเวอร์โดนอุกกาบาตตกใส่"], ans: 0 },
+                      { q: "กล่อง พาวเวอร์ซัพพลาย ที่อยู่ในเคสคอม มีหน้าที่หลักคืออะไร?", options: ["แปลงไฟบ้านเป็นไฟคอมพิวเตอร์แล้วจ่ายให้อุปกรณ์", "สำรองไฟไว้ใช้ตอนไฟดับได้สามวันสามคืน", "พ่นลมเย็นเหมือนแอร์บ้านเข้าไปในเครื่อง", "เป็นกล่องสำหรับซ่อนเงินเมีย"], ans: 0 },
+                      { q: "คำว่า AI ย่อมาจากคำว่าอะไร?", options: ["Artificial Intelligence", "Apple iPhone", "Always Internet", "Alien Information"], ans: 0 },
+                      { q: "คำว่า คุกกี้ ในเว็บไซต์ทำหน้าที่อะไร?", options: ["ไฟล์ขนาดเล็กที่เว็บบันทึกไว้จำว่าเราคือใคร", "ขนมคุกกี้ช็อกโกแลตชิปส่งตรงถึงบ้าน", "ไวรัสร้ายแรงที่จะระเบิดเครื่องในห้าวินาที", "โฆษณาขายสินค้าออนไลน์ที่ปิดไม่ได้"], ans: 0 },
+                      { q: "โปรแกรมแอนตี้ไวรัส รู้ได้ยังไงว่าไฟล์ไหนคือไวรัส?", options: ["ตรวจสอบเทียบกับฐานข้อมูลลายเซ็นไวรัส", "วัดความร้อนของเคสคอมพิวเตอร์", "ฟังเสียงพัดลมว่าหมุนดังกวนใจไหม", "ดูว่าไฟล์นั้นชื่อน่ากลัวหรือเปล่า"], ans: 0 },
+                      { q: "สัญญาณไฟตรงพอร์ตแลนหลังเครื่องคอม ส่วนใหญ่บอกสถานะอะไร?", options: ["ไฟติดคือเชื่อมต่อสายสำเร็จ ไฟพริบคือข้อมูลกำลังวิ่ง", "ไฟสีแดงคือเครื่องร้อน ไฟสีฟ้าคือเน็ตแรงจัด", "ไฟสีขาวคือเครื่องนอนหลับ ไฟสีม่วงคือเครื่องติดเชื้อ", "ไฟสีเหลืองคือจ่ายตังค์เน็ตแล้ว ไฟสีดำคือเน็ตตัด"], ans: 0 },
+                      { q: "คีย์ลัดสายวาร์ปในตำนาน กด Alt + F4 จะเกิดผลลัพธ์อะไรขึ้น?", options: ["ปิดโปรแกรมหรือหน้าต่างที่เปิดอยู่ออกไปทันที", "เปิดเครื่องคิดเลขขึ้นมาคำนวณหวย", "สลับหน้าจอไปที่เกมทันที", "รีสตาร์ตเครื่องใหม่แบบไม่ถามซักคำ"], ans: 0 },
+                      { q: "คำว่า พิกเซล บนหน้าจอคอมพิวเตอร์หรือหน้าจอมือถือ หมายถึงอะไร?", options: ["จุดสีเล็กๆ นับล้านจุดที่ประกอบกันเป็นรูปภาพ", "ความกว้างของขอบจอแสดงผล", "ความจุของแบตเตอรี่หน้าจอ", "ระดับความดังของลำโพงหน้าจอ"], ans: 0 },
+                      { q: "คำว่า URL ที่เราใช้พิมพ์ชื่อเว็บไซต์ ย่อมาจากอะไร?", options: ["Uniform Resource Locator", "Universal Radio Link", "User Record List", "Unlimited Real Location"], ans: 0 }
+                  ],
+                  medium: [
+                      { q: "ตามกฎของโอห์ม ความสัมพันธ์ของแรงดัน (V), กระแส (I) และความต้านทาน (R) คือข้อใด?", options: ["V = I × R", "V = I / R", "V = I + R", "V = R / I"], ans: 0 },
+                      { q: "ในวงจรลอจิกดิจิทัลมาตรฐานแบบ TTL ระดับแรงดันของ Logic HIGH มีค่าประมาณเท่าใด?", options: ["2.0V ถึง 5.0V", "0.0V ถึง 0.8V", "12.0V ถึง 24.0V", "110.0V ถึง 220.0V"], ans: 0 },
+                      { q: "ลอจิกเกต ชนิดใดให้ผลลัพธ์เป็น 1 เมื่ออินพุตทั้งหมดเป็น 1 เท่านั้น?", options: ["AND Gate", "OR Gate", "NOT Gate", "XOR Gate"], ans: 0 },
+                      { q: "หมายเลข IP Address รูปแบบ IPv4 ประกอบด้วยขนาดข้อมูลกี่บิต?", options: ["32 บิต", "64 บิต", "128 บิต", "16 บิต"], ans: 0 },
+                      { q: "ระบบจัดหมวดหมู่ IP Address แบบ IPv6 มีขนาดกี่บิต เพื่อรองรับอุปกรณ์ที่เพิ่มขึ้น?", options: ["128 บิต", "64 บิต", "256 บิต", "32 บิต"], ans: 0 },
+                      { q: "สถาปัตยกรรมคอมพิวเตอร์แบบ Von Neumann ประกอบด้วยส่วนประกอบหลักใดบ้าง?", options: ["CPU, Memory, I/O Devices", "GPU, VRAM, Power Supply", "Display, Keyboard, Storage", "ALU, Control Unit, Register"], ans: 0 },
+                      { q: "โปรโตคอล HTTPS ปลอดภัยกว่า HTTP แบบเดิมเนื่องจากมีการเข้ารหัสด้วยสิ่งใด?", options: ["TLS / SSL", "SSH / FTP", "UDP / IP", "DNS / DHCP"], ans: 0 },
+                      { q: "โครงสร้างข้อมูลแบบ Stack ทำงานด้วยหลักการใด?", options: ["LIFO", "FIFO", "FILO", "Random Access"], ans: 0 },
+                      { q: "โครงสร้างข้อมูลแบบ Queue ทำงานด้วยหลักการใด?", options: ["FIFO", "LIFO", "Priority Queue", "Direct Memory Access"], ans: 0 },
+                      { q: "ลอจิกเกต NAND Gate เกิดจากการนำเกตใดมาต่อรวมกัน?", options: ["AND Gate ต่อรวมกับ NOT Gate", "OR Gate ต่อรวมกับ NOT Gate", "XOR Gate ต่อรวมกับ AND Gate", "NOR Gate ต่อรวมกับ OR Gate"], ans: 0 },
+                      { q: "พอร์ตการสื่อสารมาตรฐานของโปรโตคอล HTTP คือพอร์ตหมายเลขใด?", options: ["Port 80", "Port 443", "Port 21", "Port 22"], ans: 0 },
+                      { q: "พอร์ตการสื่อสารมาตรฐานของโปรโตคอล HTTPS คือพอร์ตหมายเลขใด?", options: ["Port 443", "Port 80", "Port 8080", "Port 25"], ans: 0 },
+                      { q: "คำสั่งภาษา SQL ข้อใดใช้สำหรับการดึงข้อมูลออกจากฐานข้อมูล?", options: ["SELECT", "INSERT", "UPDATE", "DELETE"], ans: 0 },
+                      { q: "กระบวนการ Compilation ในการเขียนโปรแกรมหมายถึงสิ่งใด?", options: ["การแปลง Source Code เป็น Machine Code", "การตรวจสอบและค้นหา Bug ในโปรแกรม", "การติดตั้งไฟล์โปรแกรมลงในฮาร์ดดิสก์", "การจัดสรรพื้นที่หน่วยความจำให้โปรแกรม"], ans: 0 },
+                      { q: "ในระบบปฏิบัติการ สภาวะ Deadlock คือสถานะแบบใด?", options: ["Process รอคอยทรัพยากรซึ่งกันและกันจนค้าง", "RAM เต็มจนระบบปฏิบัติการหยุดการทำงาน", "Hard Disk ชำรุดจนไม่สามารถอ่านไฟล์ได้", "สัญญาณ Clock เกิดความล่าช้ากว่ากำหนด"], ans: 0 },
+                      { q: "หน้าที่หลักของ DNS Server คืออะไร?", options: ["การแปลงชื่อ Domain Name ให้เป็น IP Address", "การป้องกันและกรองผู้บุกรุกเข้าสู่ระบบเครือข่าย", "การจัดสรรหมายเลข IP Address ให้เครื่องลูกข่าย", "การจัดเก็บข้อมูลไฟล์บนเว็บไซต์ทั้งหมดไว้ในเซิร์ฟเวอร์"], ans: 0 },
+                      { q: "หน่วยความจำ Cache ใน CPU มีหน้าที่สำคัญอย่างไร?", options: ["การบันทึกข้อมูลที่ใช้บ่อยเพื่อให้ CPU อ่านได้ไว", "การจัดเก็บไฟล์ภาพและวิดีโอที่มีขนาดใหญ่มาก", "การสำรองข้อมูลในวงจรเมื่อเกิดเหตุการณ์ไฟดับ", "การเชื่อมต่อสัญญาณข้อมูลกับอุปกรณ์ภายนอก"], ans: 0 },
+                      { q: "อัลกอริทึมการเรียงลำดับแบบ Bubble Sort มี Time Complexity เฉลี่ยเป็นเท่าใด?", options: ["O(n²)", "O(n log n)", "O(n)", "O(1)"], ans: 0 },
+                      { q: "ข้อใดคือหน้าที่ของ MAC Address ในระบบเครือข่ายคอมพิวเตอร์?", options: ["หมายเลขอ้างอิงทางกายภาพของอุปกรณ์การ์ดเน็ตเวิร์ก", "หมายเลขระบุตำแหน่งพิกัด GPS ของคอมพิวเตอร์", "หมายเลขบัญชีผู้ใช้งานที่ลงทะเบียนในระบบ", "หมายเลขสุ่มชั่วคราวที่เปลี่ยนไปทุกครั้งที่เปิดเครื่อง"], ans: 0 },
+                      { q: "เทคโนโลยี Virtual Memory ในระบบปฏิบัติการ มีประโยชน์อย่างไร?", options: ["การใช้พื้นที่บางส่วนของ Disk จำลองเป็น RAM", "การเร่งความเร็วการ์ดจอให้ประมวลผลได้ดีขึ้น", "การจำลองระบบปฏิบัติการอื่นขึ้นมาเปิดใช้งาน", "การบีบอัดข้อมูลในหน่วยความจำหลักให้เพิ่มขึ้น"], ans: 0 },
+                      { q: "ในทางอิเล็กทรอนิกส์ ตัวต้านทาน มีหน้าที่อะไรในวงจร?", options: ["การจำกัดและต่อต้านการไหลของกระแสไฟฟ้า", "การเก็บสะสมประจุไฟฟ้าเพื่อจ่ายในวงจร", "การแปลงสัญญาณกระแสสลับเป็นกระแสตรง", "การขยายความถี่และกำลังของสัญญาณไฟฟ้า"], ans: 0 },
+                      { q: "วงจร Flip-Flop ในระบบดิจิทัลใช้ทำหน้าที่อะไรเป็นหลัก?", options: ["การเก็บบันทึกข้อมูลดิจิทัลขนาด 1 บิต", "การสลับทิศทางการไหลของกระแสไฟฟ้า", "การสร้างสัญญาณนาฬิกากำหนดจังหวะชิป", "การลดความต้านทานไฟฟ้าในวงจรอิเล็กทรอนิกส์"], ans: 0 },
+                      { q: "ความแตกต่างหลักระหว่างโปรโตคอล TCP และ UDP คือข้อใด?", options: ["TCP เน้นความถูกต้อง ส่วน UDP เน้นความรวดเร็ว", "TCP ใช้ส่งข้อความ ส่วน UDP ใช้ส่งไฟล์ขนาดใหญ่", "TCP ทำงานไร้สาย ส่วน UDP ต้องเชื่อมสาย LAN", "TCP มีความปลอดภัยต่ำ ส่วน UDP มีความปลอดภัยสูง"], ans: 0 }
+                  ],
+                  hard: [
+                      { q: "ในสถาปัตยกรรม CPU แบบ Pipelining ปรากฏการณ์ Data Hazard เกิดจากสาเหตุใด?", options: ["คำสั่งปัจจุบันต้องใช้ผลลัพธ์จากคำสั่งก่อนที่ยังประมวลผลไม่เสร็จ", "การทำนายทิศทางคำสั่งเงื่อนไขเกิดความผิดพลาด", "เกิดความแออัดในการเข้าถึงบัสฮาร์ดแวร์พร้อมกัน", "สัญญาณนาฬิกาเกิดการสูญเสียจังหวะซิงโครไนซ์"], ans: 0 },
+                      { q: "ทฤษฎีบท CAP Theorem ในระบบ Distributed Database ระบุว่ารับประกันคุณสมบัติได้เพียง 2 ใน 3 ข้อ คือข้อใด?", options: ["Consistency, Availability, Partition Tolerance", "Concurrency, Accuracy, Performance Metric", "Capacity, Availability, Processing Control", "Control, Authentication, Protection Logic"], ans: 0 },
+                      { q: "อัลกอริทึมการเข้ารหัสแบบ RSA อาศัยความยากทางคณิตศาสตร์เรื่องใดเป็นหลัก?", options: ["การแยกตัวประกอบจำนวนเฉพาะขนาดใหญ่", "การคำนวณดีเทอร์มิแนนต์ของเมทริกซ์เอกลักษณ์", "การแปลงอนุกรมฟูเรียร์เชิงซ้อน", "การแก้สมการดิฟเฟอเรนเชียลอันดับสูง"], ans: 0 },
+                      { q: "เทคนิค Branch Prediction ใน CPU มีไว้เพื่อแก้ปัญหา Hazard ประเภทใด?", options: ["Control Hazard", "Data Hazard", "Structural Hazard", "Memory Hazard"], ans: 0 },
+                      { q: "กลไก Page Fault ในระบบ Virtual Memory เกิดขึ้นเมื่อใด?", options: ["CPU เรียกใช้ Memory Page ที่ยังไม่ได้ถูกโหลดขึ้น RAM จริง", "แผงหน่วยความจำ RAM เกิดความเสียหายทางกายภาพ", "โปรแกรมเขียนข้อมูลเกินขอบเขตโครงสร้างอาร์เรย์", "เกิดไฟล์ขยะสะสมในระบบปฏิบัติการมากเกินเกณฑ์"], ans: 0 },
+                      { q: "ข้อใดคือหลักการของ ACID Properties ในระบบ Transactional Database?", options: ["Atomicity, Consistency, Isolation, Durability", "Accuracy, Control, Integrity, Data Protection", "Access, Connection, Indexing, Deletion Logic", "Authentication, Cipher, Inspection, Defense Rules"], ans: 0 },
+                      { q: "ทฤษฎีการสุ่มตัวอย่างของ Nyquist-Shannon ระบุว่าอัตราการสุ่มตัวอย่าง ต้องเป็นอย่างไรเทียบกับความถี่สูงสุด?", options: ["อย่างน้อย 2 เท่าของความถี่สูงสุด", "เท่ากับความถี่สูงสุดพอดี", "เป็นครึ่งหนึ่งของความถี่สูงสุด", "มากกว่า 10 เท่าของความถี่สูงสุด"], ans: 0 }
+                  ]
+              };
+
+              let currentQuizQuestions = [];
+
+              function shuffleArray(arr) {
+                  let array = [...arr];
+                  for (let i = array.length - 1; i > 0; i--) {
+                      const j = Math.floor(Math.random() * (i + 1));
+                      [array[i], array[j]] = [array[j], array[i]];
+                  }
+                  return array;
+              }
+
+              // 🎲 ฟังก์ชันสุ่มดึงข้อสอบ (ง่าย 5 ข้อ, ปานกลาง 3 ข้อ, ยาก 2 ข้อ รวม 10 ข้อ) พร้อมสลับช้อยส์
+              function prepareRandomQuestions() {
+                  const easySample = shuffleArray(questionPool.easy).slice(0, 5);
+                  const medSample = shuffleArray(questionPool.medium).slice(0, 3);
+                  const hardSample = shuffleArray(questionPool.hard).slice(0, 2);
+
+                  const selectedPool = [...easySample, ...medSample, ...hardSample];
+
+                  currentQuizQuestions = selectedPool.map(qObj => {
+                      let opts = qObj.options.map((opt, i) => ({ opt, isCorrect: i === qObj.ans }));
+                      opts = shuffleArray(opts);
+                      return {
+                          q: qObj.q,
+                          shuffledOptions: opts
+                      };
+                  });
+              }
+
+              const ballTargets = [
+                  { id: 0, x: 10 * TILE_SIZE, y: 11 * TILE_SIZE, active: true },
+                  { id: 1, x: 3 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+                  { id: 2, x: 8 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+                  { id: 3, x: 12 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+                  { id: 4, x: 16 * TILE_SIZE, y: 7 * TILE_SIZE, active: true },
+                  { id: 5, x: 2 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+                  { id: 6, x: 6 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+                  { id: 7, x: 10 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+                  { id: 8, x: 14 * TILE_SIZE, y: 3 * TILE_SIZE, active: true },
+                  { id: 9, x: 17 * TILE_SIZE, y: 3 * TILE_SIZE, active: true }
+              ];
+
+              const keys = { Up: false, Down: false, Left: false, Right: false };
+              let activeTarget = null;
+              let isQuizOpen = false;
+              let isGameStarted = false;
+              let isLBModalOpen = false;
+
+              // ================= VIRTUAL JOYSTICK =================
+              let joystickVector = { x: 0, y: 0 };
+              let isJoystickActive = false;
+              const joystickBase = document.getElementById('joystick-base');
+              const joystickStick = document.getElementById('joystick-stick');
+              const joystickContainer = document.getElementById('joystick-container');
+
+              function handleJoystickStart(clientX, clientY) {
+                  if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
+                  isJoystickActive = true;
+                  updateJoystick(clientX, clientY);
+              }
+
+              function handleJoystickMove(clientX, clientY) {
+                  if (!isJoystickActive) return;
+                  updateJoystick(clientX, clientY);
+              }
+
+              function handleJoystickEnd() {
+                  isJoystickActive = false;
+                  joystickVector = { x: 0, y: 0 };
+                  joystickStick.style.transform = `translate(0px, 0px)`;
+              }
+
+              function updateJoystick(clientX, clientY) {
+                  const rect = joystickBase.getBoundingClientRect();
+                  const centerX = rect.left + rect.width / 2;
+                  const centerY = rect.top + rect.height / 2;
+                  const maxRadius = (rect.width / 2) - 10;
+
+                  let deltaX = clientX - centerX;
+                  let deltaY = clientY - centerY;
+                  let distance = Math.hypot(deltaX, deltaY);
+
+                  if (distance > maxRadius) {
+                      const angle = Math.atan2(deltaY, deltaX);
+                      deltaX = Math.cos(angle) * maxRadius;
+                      deltaY = Math.sin(angle) * maxRadius;
+                  }
+
+                  joystickStick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                  joystickVector.x = deltaX / maxRadius;
+                  joystickVector.y = deltaY / maxRadius;
+              }
+
+              joystickContainer.addEventListener('touchstart', e => {
+                  e.preventDefault();
+                  if (e.touches.length > 0) handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
+              });
+
+              window.addEventListener('touchmove', e => {
+                  if (isJoystickActive && e.touches.length > 0) {
+                      handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+                  }
+              });
+
+              window.addEventListener('touchend', () => handleJoystickEnd());
+
+              joystickContainer.addEventListener('mousedown', e => {
+                  e.preventDefault();
+                  handleJoystickStart(e.clientX, e.clientY);
+              });
+
+              window.addEventListener('mousemove', e => {
+                  if (isJoystickActive) handleJoystickMove(e.clientX, e.clientY);
+              });
+
+              window.addEventListener('mouseup', () => handleJoystickEnd());
+
+              function resetKeys() {
+                  keys.Up = false; keys.Down = false; keys.Left = false; keys.Right = false;
+                  player.isMoving = false;
+                  handleJoystickEnd();
+              }
+
+              window.addEventListener('keydown', e => handleKey(e.key, true));
+              window.addEventListener('keyup', e => handleKey(e.key, false));
+              window.addEventListener('blur', resetKeys);
+
+              function handleKey(key, isPressed) {
+                  if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
+                  if (key === 'ArrowUp' || key === 'w' || key === 'W') keys.Up = isPressed;
+                  if (key === 'ArrowDown' || key === 's' || key === 'S') keys.Down = isPressed;
+                  if (key === 'ArrowLeft' || key === 'a' || key === 'A') keys.Left = isPressed;
+                  if (key === 'ArrowRight' || key === 'd' || key === 'D') keys.Right = isPressed;
+              }
+
+              // ================= LEADERBOARD MODALS =================
+              function openLBModal() {
+                  isLBModalOpen = true;
+                  resetKeys();
+                  if (window.fetchAndRenderLeaderboard) {
+                      window.fetchAndRenderLeaderboard('lb-view-body');
+                  }
+                  document.getElementById('lb-view-modal').style.display = 'flex';
+              }
+
+              function closeLBModal() {
+                  document.getElementById('lb-view-modal').style.display = 'none';
+                  isLBModalOpen = false;
+              }
+
+              function startGame() {
+                  if (checkPlayRestriction()) return;
+
+                  prepareRandomQuestions();
+
+                  document.getElementById('player-disp-name').innerText = playerName;
+                  document.getElementById('start-modal').style.display = 'none';
+
+                  isGameStarted = true;
+                  startTime = Date.now();
+                  timerInterval = setInterval(updateTimer, 1000);
+              }
+
+              function updateTimer() {
+                  if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
+                  elapsedTimeInSec = Math.floor((Date.now() - startTime) / 1000);
+                  document.getElementById('timer-disp').innerText = `⏱️ ${formatTimeStr(elapsedTimeInSec)}`;
+              }
+
+              // ================= PLAYER MOVEMENT & COLLISION =================
+              function updatePlayer() {
+                  if (!isGameStarted || isQuizOpen || isLBModalOpen) return;
+
+                  let dx = 0; let dy = 0;
+
+                  if (keys.Up) dy -= 1;
+                  if (keys.Down) dy += 1;
+                  if (keys.Left) dx -= 1;
+                  if (keys.Right) dx += 1;
+
+                  if (dx !== 0 && dy !== 0) {
+                      dx *= 0.7071;
+                      dy *= 0.7071;
+                  }
+
+                  if (isJoystickActive) {
+                      dx = joystickVector.x;
+                      dy = joystickVector.y;
+                  }
+
+                  player.isMoving = (dx !== 0 || dy !== 0);
+
+                  let nextX = player.x + dx * player.speed;
+                  let nextY = player.y + dy * player.speed;
+
+                  // Wall Collision Boundaries
+                  const wallTopY = 9.0 * TILE_SIZE;
+                  const wallBottomY = 11.0 * TILE_SIZE;
+                  const gateLeftX = 8.8 * TILE_SIZE;
+                  const gateRightX = 11.2 * TILE_SIZE;
+
+                  let boxNextX = { left: nextX, right: nextX + player.width, top: player.y, bottom: player.y + player.height };
+                  if (boxNextX.bottom > wallTopY && boxNextX.top < wallBottomY) {
+                      if (boxNextX.left < gateLeftX) {
+                          if (player.x >= gateLeftX) nextX = gateLeftX;
+                      }
+                      if (boxNextX.right > gateRightX) {
+                          if (player.x + player.width <= gateRightX) nextX = gateRightX - player.width;
+                      }
+                  }
+
+                  let boxNextY = { left: nextX, right: nextX + player.width, top: nextY, bottom: nextY + player.height };
+                  if (boxNextY.bottom > wallTopY && boxNextY.top < wallBottomY) {
+                      if (boxNextY.left < gateLeftX || boxNextY.right > gateRightX) {
+                          if (dy > 0 && player.y + player.height <= wallTopY) {
+                              nextY = wallTopY - player.height;
+                          } else if (dy < 0 && player.y >= wallBottomY) {
+                              nextY = wallBottomY;
+                          }
+                      }
+                  }
+
+                  player.x = Math.max(TILE_SIZE, Math.min(canvas.width - TILE_SIZE - player.width, nextX));
+                  player.y = Math.max(TILE_SIZE, Math.min(canvas.height - TILE_SIZE - player.height, nextY));
+
+                  // Collision Check with Soccer Balls
+                  ballTargets.forEach(ball => {
+                      if (ball.active && !isQuizOpen && !isLBModalOpen) {
+                          const dist = Math.hypot((player.x + 12) - (ball.x + 16), (player.y + 12) - (ball.y + 16));
+                          if (dist < 22) {
+                              triggerQuiz(ball);
+                          }
+                      }
+                  });
+              }
+
+              function triggerQuiz(ball) {
+                  if (isQuizOpen || isLBModalOpen) return;
+
+                  resetKeys();
+                  isQuizOpen = true;
+                  activeTarget = ball;
+
+                  const q = currentQuizQuestions[ball.id];
+
+                  document.getElementById('quiz-gate-num').innerText = `FOOTBALL MISSION #${ball.id + 1}`;
+                  document.getElementById('quiz-question').innerText = q.q;
+
+                  const feedback = document.getElementById('quiz-feedback');
+                  feedback.style.display = 'none';
+                  feedback.innerText = '';
+
+                  const optionsContainer = document.getElementById('quiz-options');
+                  optionsContainer.innerHTML = '';
+
+                  q.shuffledOptions.forEach((item, idx) => {
+                      const btn = document.createElement('button');
+                      btn.className = 'quiz-btn';
+                      btn.dataset.correct = item.isCorrect;
+                      btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}.</strong>&nbsp; ${item.opt}`;
+                      btn.onclick = () => handleAnswer(item.isCorrect, btn);
+                      optionsContainer.appendChild(btn);
+                  });
+
+                  document.getElementById('quiz-modal').style.display = 'flex';
+              }
+
+              function handleAnswer(isCorrect, selectedBtn) {
+                  const feedback = document.getElementById('quiz-feedback');
+                  const optionBtns = document.querySelectorAll('.quiz-btn');
+
+                  optionBtns.forEach(btn => {
+                      btn.disabled = true;
+                      if (btn.dataset.correct === "true") {
+                          btn.classList.add('correct-ans');
+                      }
+                  });
+
+                  if (!isCorrect && selectedBtn) {
+                      selectedBtn.classList.add('wrong-ans');
+                  }
+
+                  activeTarget.active = false;
+                  feedback.style.display = 'inline-block';
+
+                  if (isCorrect) {
+                      feedback.className = 'feedback-msg feedback-success';
+                      feedback.innerHTML = '🎉 ตอบถูกต้อง! (+1 คะแนน)';
+                      ballsPassed++;
+                  } else {
+                      feedback.className = 'feedback-msg feedback-error';
+                      feedback.innerHTML = '❌ ตอบผิด!';
+                  }
+
+                  setTimeout(() => {
+                      document.getElementById('keys-text').innerText = `⚽ ${ballsPassed}/10`;
+                      document.getElementById('quiz-modal').style.display = 'none';
+                      resetKeys();
+                      isQuizOpen = false;
+
+                      const remainingBalls = ballTargets.filter(b => b.active).length;
+                      if (remainingBalls === 0) {
+                          finishGame();
+                      }
+                  }, 1400);
+              }
+
+              function finishGame() {
+                  clearInterval(timerInterval);
+                  localStorage.setItem("cpe_quiz_played", "true");
+
+                  document.getElementById('win-summary').innerText = `คุณ ${playerName} ทำคะแนนได้ ${ballsPassed}/10 ข้อ | เวลา ${formatTimeStr(elapsedTimeInSec)}`;
+
+                  if (window.saveScoreToCloud) window.saveScoreToCloud(playerName, playerSchool, ballsPassed, elapsedTimeInSec);
+                  if (window.fetchAndRenderLeaderboard) window.fetchAndRenderLeaderboard('leaderboard-body');
+                  document.getElementById('win-modal').style.display = 'flex';
+              }
+
+              // ================= RENDER SPRITES & WORLD =================
+              function drawPixelMatrix(matrix, colorMap, startX, startY, pSize = 2) {
+                  for (let r = 0; r < matrix.length; r++) {
+                      for (let c = 0; c < matrix[r].length; c++) {
+                          const char = matrix[r][c];
+                          if (char !== '.' && colorMap[char]) {
+                              ctx.fillStyle = colorMap[char];
+                              ctx.fillRect(startX + (c * pSize), startY + (r * pSize), pSize, pSize);
+                          }
+                      }
+                  }
+              }
+
+              const CONE_MATRIX = [
+                  ".......KK.......", "......KLLK......", "......KODK......", ".....KWWWWK.....",
+                  ".....KSSWSK.....", ".....KLLODK.....", "....KWWWWWWK....", "....KSSSWWSK....",
+                  "....KLLLLODK....", "...KLLLLLODDK...", "..KKKKLLLLODDKK.", ".KLLLLLLLLODDDK.",
+                  "KLLLLLLLLLODDDDK", "KLLLLLLLLLODDDDK", "KLLLLLLLLLODDDDK", ".KKKKKKKKKKKKKK."
+              ];
+              const CONE_COLORS = { 'K': '#18181b', 'L': '#fb923c', 'O': '#f97316', 'D': '#ea580c', 'W': '#ffffff', 'S': '#cbd5e1' };
+
+              const TREE_MATRIX = [
+                  ".....KKKKK.....", "...KKGGGGGKK...", "..KGGGRGGGGGK..", ".KGGGGGGGGRGGK.",
+                  ".KRGGGGGGGGGGK.", ".KGGGRGGGGGRGK.", ".KGGGGGGGGGGGK.", "..KGGGGGGGGGK..",
+                  "...KKKKTTTKKK..", ".....KTTTK.....", ".....KTTTK.....", ".....KTTTK.....",
+                  "....KTTTTTK....", "....KKKKKKK...."
+              ];
+              const TREE_COLORS = { 'K': '#1f2937', 'G': '#10b981', 'R': '#f43f5e', 'T': '#f97316' };
+
+              function drawAngledShadow(x, y, width, height, opacity = 0.35) {
+                  ctx.save();
+                  ctx.fillStyle = `rgba(15, 23, 42, ${opacity})`;
+                  ctx.beginPath();
+                  ctx.ellipse(x - 8, y + 6, width, height / 2, -Math.PI / 6, 0, Math.PI * 2);
+                  ctx.fill();
+                  ctx.restore();
+              }
+
+              function draw3DFootball(ball) {
+                  const hoverY = Math.sin((animFrame + ball.id * 8) * 0.1) * 3.5;
+                  const bx = ball.x + 16;
+                  const by = ball.y + 16 + hoverY;
+                  const radius = 14;
+
+                  let pinColor = '#f97316';
+                  let baseColor1 = '#ffffff';
+                  let baseColor2 = '#e2e8f0';
+                  let spotColor = '#0f172a';
+
+                  if (ball.id >= 5 && ball.id <= 8) {
+                      pinColor = '#eab308';
+                      baseColor1 = '#fef08a';
+                      baseColor2 = '#eab308';
+                      spotColor = '#18181b';
+                  } else if (ball.id === 9) {
+                      pinColor = '#ef4444';
+                      baseColor1 = '#fca5a5';
+                      baseColor2 = '#dc2626';
+                      spotColor = '#18181b';
+                  }
+
+                  ctx.fillStyle = pinColor;
+                  ctx.beginPath();
+                  ctx.moveTo(bx - 7, by - 24);
+                  ctx.lineTo(bx + 7, by - 24);
+                  ctx.lineTo(bx, by - 16);
+                  ctx.closePath();
+                  ctx.fill();
+                  ctx.strokeStyle = '#ffffff';
+                  ctx.lineWidth = 1.5;
+                  ctx.stroke();
+
+                  drawAngledShadow(bx, ball.y + 26, 15, 8, 0.4);
+
+                  const ballGrad = ctx.createRadialGradient(bx + 5, by - 6, 2, bx, by, radius);
+                  ballGrad.addColorStop(0, '#ffffff');
+                  ballGrad.addColorStop(0.5, baseColor1);
+                  ballGrad.addColorStop(1, baseColor2);
+
+                  ctx.fillStyle = ballGrad;
+                  ctx.beginPath();
+                  ctx.arc(bx, by, radius, 0, Math.PI * 2);
+                  ctx.fill();
+
+                  ctx.fillStyle = spotColor;
+                  ctx.beginPath(); ctx.arc(bx, by, 4.2, 0, Math.PI * 2); ctx.fill();
+                  ctx.beginPath(); ctx.arc(bx - 10, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
+                  ctx.beginPath(); ctx.arc(bx + 10, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
+                  ctx.beginPath(); ctx.arc(bx, by + 10, 3.2, 0, Math.PI * 2); ctx.fill();
+
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                  ctx.beginPath();
+                  ctx.arc(bx + 4, by - 6, 3, 0, Math.PI * 2);
+                  ctx.fill();
+
+                  ctx.strokeStyle = '#020617';
+                  ctx.lineWidth = 2;
+                  ctx.beginPath();
+                  ctx.arc(bx, by, radius, 0, Math.PI * 2);
+                  ctx.stroke();
+              }
+
+              function drawSchoolWallAndGate() {
+                  const wallY = 9.2 * TILE_SIZE;
+
+                  const treePositions = [1, 3, 5, 13, 15, 17, 19];
+                  treePositions.forEach(tx => {
+                      const wx = tx * TILE_SIZE - 4;
+                      const wy = wallY - 26;
+                      drawAngledShadow(wx + 16, wy + 28, 16, 8, 0.3);
+                      drawPixelMatrix(TREE_MATRIX, TREE_COLORS, wx, wy, 2.2);
+                  });
+
+                  ctx.strokeStyle = '#e2e8f0';
+                  ctx.lineWidth = 2;
+                  for (let x = 0; x < canvas.width; x += 16) {
+                      if (x >= 7.5 * TILE_SIZE && x <= 11.5 * TILE_SIZE) continue;
+                      ctx.beginPath();
+                      ctx.arc(x + 8, wallY - 2, 5, Math.PI, 0);
+                      ctx.stroke();
+                      ctx.fillRect(x + 7, wallY - 2, 2, 10);
+                  }
+
+                  const drawBrickSection = (startX, endX) => {
+                      ctx.fillStyle = '#f1f5f9';
+                      ctx.fillRect(startX, wallY + 8, endX - startX, 4);
+                      ctx.fillStyle = '#cbd5e1';
+                      ctx.fillRect(startX, wallY + 12, endX - startX, 6);
+
+                      const brickH = 8;
+                      const brickW = 16;
+                      ctx.fillStyle = '#ef4444';
+                      ctx.fillRect(startX, wallY + 18, endX - startX, 2 * TILE_SIZE);
+
+                      ctx.strokeStyle = '#fef2f2';
+                      ctx.lineWidth = 1;
+                      for (let y = wallY + 18; y < wallY + 18 + 2 * TILE_SIZE; y += brickH) {
+                          ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
+                          const offset = (Math.floor((y - wallY) / brickH) % 2) * (brickW / 2);
+                          for (let x = startX + offset; x < endX; x += brickW) {
+                              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + brickH); ctx.stroke();
+                          }
+                      }
+
+                      ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+                      ctx.fillRect(startX, wallY + 18 + 2 * TILE_SIZE, endX - startX, 14);
+                  };
+
+                  drawBrickSection(0, 7.5 * TILE_SIZE);
+                  drawBrickSection(11.2 * TILE_SIZE, canvas.width);
+
+                  ctx.fillStyle = '#334155';
+                  ctx.fillRect(7.5 * TILE_SIZE, wallY, 3.7 * TILE_SIZE, 2.8 * TILE_SIZE);
+
+                  const ghX = 7.2 * TILE_SIZE;
+                  const ghY = wallY - 6;
+
+                  drawAngledShadow(ghX + 35, ghY + 55, 38, 12, 0.4);
+
+                  ctx.fillStyle = '#fecdd3';
+                  ctx.fillRect(ghX, ghY + 10, 2.2 * TILE_SIZE, 1.8 * TILE_SIZE);
+                  ctx.strokeStyle = '#334155';
+                  ctx.lineWidth = 2;
+                  ctx.strokeRect(ghX, ghY + 10, 2.2 * TILE_SIZE, 1.8 * TILE_SIZE);
+
+                  const roofGrad = ctx.createLinearGradient(ghX, ghY, ghX, ghY + 10);
+                  roofGrad.addColorStop(0, '#f97316');
+                  roofGrad.addColorStop(1, '#ea580c');
+                  ctx.fillStyle = roofGrad;
+                  ctx.beginPath();
+                  ctx.roundRect(ghX - 3, ghY, 2.5 * TILE_SIZE, 10, [4, 4, 2, 2]);
+                  ctx.fill();
+
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillRect(ghX + 6, ghY + 16, 58, 26);
+                  ctx.fillStyle = '#fed7aa';
+                  ctx.fillRect(ghX + 10, ghY + 19, 22, 20);
+                  ctx.fillRect(ghX + 38, ghY + 19, 22, 20);
+
+                  const gateX = 11.2 * TILE_SIZE;
+                  const gateY = wallY + 8;
+
+                  ctx.fillStyle = '#1e293b';
+                  ctx.fillRect(gateX - 8, gateY + 12, 16, 36);
+
+                  ctx.fillStyle = '#22c55e';
+                  ctx.beginPath(); ctx.arc(gateX, gateY + 38, 5, 0, Math.PI * 2); ctx.fill();
+
+                  for (let i = 0; i < 40; i += 8) {
+                      ctx.fillStyle = (i / 8) % 2 === 0 ? '#ef4444' : '#ffffff';
+                      ctx.fillRect(gateX - 4, gateY - i + 10, 8, 8);
+                  }
+              }
+
+              function drawGrayAsphaltRoadTile(x, y) {
+                  ctx.fillStyle = '#334155';
+                  ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                  ctx.strokeStyle = '#1e293b';
+                  ctx.lineWidth = 1;
+                  ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                  ctx.fillRect(x + 2, y + 2, 6, 4);
+              }
+
+              function drawGrassPitchTile(x, y, col) {
+                  ctx.fillStyle = col % 2 === 0 ? '#16a34a' : '#15803d';
+                  ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                  ctx.fillStyle = col % 2 === 0 ? '#22c55e' : '#166534';
+                  ctx.fillRect(x + 4, y + 6, 2, 4);
+                  ctx.fillRect(x + 18, y + 20, 2, 4);
+              }
+
+              function drawFieldChalkLines(r, c, x, y) {
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                  if (r === 1) ctx.fillRect(x, y + 4, TILE_SIZE, 2);
+                  if (r === 8) ctx.fillRect(x, y + 28, TILE_SIZE, 2);
+                  if (c === 1) ctx.fillRect(x + 4, y, 2, TILE_SIZE);
+                  if (c === 18) ctx.fillRect(x + 26, y, 2, TILE_SIZE);
+              }
+
+              function drawTrafficCone(x, y) {
+                  drawAngledShadow(x + 16, y + 28, 14, 6, 0.4);
+                  drawPixelMatrix(CONE_MATRIX, CONE_COLORS, x, y, 2);
+              }
+
+              function drawPlayerCharacter() {
+                  const px = player.x;
+                  const py = player.y;
+                  const walkOffset = player.isMoving ? Math.sin(animFrame * 0.2) * 2 : 0;
+
+                  drawAngledShadow(px + 12, py + 26, 12, 6, 0.45);
+
+                  ctx.fillStyle = '#facc15';
+                  ctx.fillRect(px + 2, py - 2 + walkOffset, 20, 10);
+
+                  ctx.fillStyle = '#fde047';
+                  ctx.fillRect(px + 4, py + 4 + walkOffset, 16, 8);
+                  ctx.fillStyle = '#0f172a';
+                  ctx.fillRect(px + 6, py + 6 + walkOffset, 3, 4);
+                  ctx.fillRect(px + 15, py + 6 + walkOffset, 3, 4);
+
+                  ctx.fillStyle = '#f97316';
+                  ctx.fillRect(px + 4, py + 12 + walkOffset, 16, 10);
+
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillRect(px + 4, py + 22, 6, 6);
+                  ctx.fillRect(px + 14, py + 22, 6, 6);
+
+                  ctx.font = 'bold 11px Kanit, sans-serif';
+                  const textMetrics = ctx.measureText(playerName);
+                  const textWidth = textMetrics.width;
+
+                  const paddingX = 14;
+                  const tagWidth = textWidth + paddingX;
+                  const tagHeight = 18;
+                  const centerX = px + 12;
+                  const tagX = centerX - (tagWidth / 2);
+                  const tagY = py - 24;
+
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                  ctx.beginPath();
+                  if (ctx.roundRect) {
+                      ctx.roundRect(tagX, tagY, tagWidth, tagHeight, 5);
+                  } else {
+                      ctx.rect(tagX, tagY, tagWidth, tagHeight);
+                  }
+                  ctx.fill();
+
+                  ctx.strokeStyle = '#f97316';
+                  ctx.lineWidth = 1.5;
+                  ctx.stroke();
+
+                  ctx.fillStyle = '#ea580c';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText(playerName, centerX, tagY + (tagHeight / 2));
+                  ctx.textBaseline = 'alphabetic';
+              }
+
+              function drawSunlightAtmosphere() {
+                  const sunX = canvas.width * 0.85;
+                  const sunY = -40;
+
+                  const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, canvas.width * 1.1);
+                  sunGrad.addColorStop(0, 'rgba(255, 230, 150, 0.22)');
+                  sunGrad.addColorStop(0.5, 'rgba(255, 180, 80, 0.08)');
+                  sunGrad.addColorStop(1, 'rgba(0, 0, 0, 0.12)');
+
+                  ctx.fillStyle = sunGrad;
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                  ctx.save();
+                  ctx.globalCompositeOperation = 'lighter';
+                  ctx.fillStyle = 'rgba(255, 220, 140, 0.04)';
+
+                  ctx.beginPath();
+                  ctx.moveTo(sunX, sunY);
+                  ctx.lineTo(sunX - 350, canvas.height);
+                  ctx.lineTo(sunX - 180, canvas.height);
+                  ctx.closePath();
+                  ctx.fill();
+
+                  ctx.beginPath();
+                  ctx.moveTo(sunX, sunY);
+                  ctx.lineTo(sunX - 620, canvas.height);
+                  ctx.lineTo(sunX - 450, canvas.height);
+                  ctx.closePath();
+                  ctx.fill();
+                  ctx.restore();
+
+                  const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.35, canvas.width / 2, canvas.height / 2, canvas.width * 0.7);
+                  vig.addColorStop(0, 'rgba(0,0,0,0)');
+                  vig.addColorStop(1, 'rgba(2, 6, 23, 0.45)');
+                  ctx.fillStyle = vig;
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+              }
+
+              function render() {
+                  animFrame++;
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                  // Pitch
+                  for (let r = 0; r < 9; r++) {
+                      for (let c = 0; c < MAP_WIDTH; c++) {
+                          drawGrassPitchTile(c * TILE_SIZE, r * TILE_SIZE, c);
+                          drawFieldChalkLines(r, c, c * TILE_SIZE, r * TILE_SIZE);
+                      }
+                  }
+
+                  // Wall
+                  drawSchoolWallAndGate();
+
+                  // Road
+                  for (let r = 11; r < MAP_HEIGHT; r++) {
+                      for (let c = 0; c < MAP_WIDTH; c++) {
+                          drawGrayAsphaltRoadTile(c * TILE_SIZE, r * TILE_SIZE);
+                      }
+                  }
+
+                  // Cones
+                  for (let r = 11; r < 16; r++) {
+                      drawTrafficCone(6 * TILE_SIZE, r * TILE_SIZE);
+                      drawTrafficCone(13 * TILE_SIZE, r * TILE_SIZE);
+                  }
+
+                  // Balls
+                  ballTargets.forEach(ball => {
+                      if (ball.active) draw3DFootball(ball);
+                  });
+
+                  // Player & Lighting
+                  drawPlayerCharacter();
+                  drawSunlightAtmosphere();
+              }
+
+              function gameLoop() {
+                  updatePlayer();
+                  render();
+                  requestAnimationFrame(gameLoop);
+              }
+
+              requestAnimationFrame(gameLoop);
     </script>
-</body>
+  </body>
 </html>
