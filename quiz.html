@@ -23,6 +23,7 @@
         query,
         limit,
         serverTimestamp,
+        onSnapshot // ⚡ เพิ่มการใช้งาน onSnapshot สำหรับ Real-time
       } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -37,6 +38,9 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+
+      // ตัวแปรเก็บ Unsubscribe listener เพื่อป้องกันการดึงซ้ำซ้อน
+      const leaderboardListeners = {};
 
       window.saveScoreToCloud = async function (
         name,
@@ -88,36 +92,53 @@
         }
       };
 
-      window.fetchAndRenderLeaderboard = async function (tbodyId) {
+      // ⚡ ฟังก์ชันดึงและอัปเดตตารางคะแนนแบบ Real-time (onSnapshot)
+      window.fetchAndRenderLeaderboard = function (tbodyId) {
         const tbody = document.getElementById(tbodyId);
         if (!tbody) return;
+
+        // หากมีการเปิด Listener ไว้แล้วให้ยกเลิกอันเก่าก่อน
+        if (leaderboardListeners[tbodyId]) {
+          leaderboardListeners[tbodyId]();
+        }
+
         tbody.innerHTML =
-          '<tr><td colspan="4" style="color: #64748b; padding: 15px;">กำลังโหลดสถิติ...</td></tr>';
+          '<tr><td colspan="4" style="color: #64748b; padding: 15px;">กำลังโหลดสถิติแบบ Real-time...</td></tr>';
 
         try {
           const q = query(collection(db, "leaderboard"), limit(100));
-          const querySnapshot = await getDocs(q);
-          let list = [];
-          querySnapshot.forEach((docSnap) => {
-            list.push(docSnap.data());
-          });
 
-          list.sort((a, b) => {
-            const scoreA =
-              a.correctTotal !== undefined
-                ? a.correctTotal
-                : Math.floor((a.score || 0) / 100);
-            const scoreB =
-              b.correctTotal !== undefined
-                ? b.correctTotal
-                : Math.floor((b.score || 0) / 100);
-            if (scoreB !== scoreA) {
-              return scoreB - scoreA;
-            }
-            return (a.time || 0) - (b.time || 0);
-          });
+          // ใช้ onSnapshot เพื่อติดตามการเปลี่ยนแปลงข้อมูลตลอดเวลา
+          leaderboardListeners[tbodyId] = onSnapshot(q, (querySnapshot) => {
+            let list = [];
+            querySnapshot.forEach((docSnap) => {
+              list.push(docSnap.data());
+            });
 
-          renderTableRows(tbody, list.slice(0, 50));
+            // จัดเรียงลำดับ คะแนนมากไปน้อย -> เวลาใช้น้อยไปมาก
+            list.sort((a, b) => {
+              const scoreA =
+                a.correctTotal !== undefined
+                  ? a.correctTotal
+                  : Math.floor((a.score || 0) / 100);
+              const scoreB =
+                b.correctTotal !== undefined
+                  ? b.correctTotal
+                  : Math.floor((b.score || 0) / 100);
+              if (scoreB !== scoreA) {
+                return scoreB - scoreA;
+              }
+              return (a.time || 0) - (b.time || 0);
+            });
+
+            renderTableRows(tbody, list.slice(0, 50));
+          }, (error) => {
+            console.warn("Real-time Leaderboard error:", error);
+            let list = JSON.parse(
+              localStorage.getItem("cpe_quiz_lb_stack") || "[]",
+            );
+            renderTableRows(tbody, list);
+          });
         } catch (e) {
           console.warn(
             "ดึงข้อมูลจาก Cloud ไม่สำเร็จ ใชัพลัง LocalStorage สำรอง:",
