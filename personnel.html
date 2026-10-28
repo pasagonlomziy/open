@@ -15,18 +15,26 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased text-slate-800 min-h-screen p-3 sm:p-6 bg-slate-50 relative overflow-x-hidden">
+<body class="font-sans antialiased text-slate-800 min-h-screen p-3 sm:p-6 bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/40 relative overflow-x-hidden">
 
-    <!-- พื้นหลังมินิมอล -->
-    <div class="fixed inset-0 z-0 bg-white pointer-events-none">
-        <div class="absolute top-0 right-0 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-orange-100/50 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-amber-100/40 rounded-full blur-3xl"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+    <!-- ================= พื้นหลังสไตล์นุ่มนวล สบายตา (Ambient background) ================= -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <!-- ดวงไฟแสงฟุ้งมุมขวาบน (โทนส้มพาสเทลอ่อน) -->
+        <div class="absolute -top-24 -right-24 w-[450px] sm:w-[700px] h-[450px] sm:h-[700px] bg-orange-200/40 rounded-full blur-[100px]"></div>
+        
+        <!-- ดวงไฟแสงฟุ้งมุมซ้ายล่าง (โทนแอมเบอร์อุ่น) -->
+        <div class="absolute -bottom-32 -left-32 w-[400px] sm:w-[650px] h-[400px] sm:h-[650px] bg-amber-200/35 rounded-full blur-[110px]"></div>
+        
+        <!-- ดวงไฟแสงฟุ้งตรงกลางซ้าย (โทนฟ้าอ่อนตัดสายตา) -->
+        <div class="absolute top-1/3 -left-40 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-sky-100/50 rounded-full blur-[90px]"></div>
+
+        <!-- ลายจุดมินิมอล Dot Grid ให้ดูโมเดิร์นและสบายตา -->
+        <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-35"></div>
     </div>
 
     <div class="relative z-10 max-w-6xl mx-auto pt-2 sm:pt-6 pb-16">
         <!-- ปุ่มกดกลับหน้าหลัก -->
-        <button onclick="history.back()" class="mb-4 sm:mb-6 border-2 border-orange-500 text-orange-600 font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-sm flex items-center gap-1.5 bg-white">
+        <button onclick="history.back()" class="mb-4 sm:mb-6 border-2 border-orange-500/80 text-orange-600 font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-sm flex items-center gap-1.5 bg-white/80 backdrop-blur-sm">
             &larr; กลับหน้าหลัก
         </button>
         
@@ -42,7 +50,7 @@
             <div class="flex justify-center">
                 <div class="w-40 sm:w-48 flex flex-col items-center">
                     <span class="bg-orange-600 text-white font-black text-[10px] sm:text-xs px-3 py-0.5 rounded-full mb-1.5 shadow-md">หัวหน้าสาขาวิชา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-3 text-center min-h-[140px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-3 text-center min-h-[140px] transition-all">
                         <img src="photoarjan/Wuttipong.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=วุฒิพงษ์&background=f97316&color=fff&bold=true';" alt="ผศ.ดร. วุฒิพงษ์ พิชิตวงศ์" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover mb-2 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-xs sm:text-sm font-bold text-slate-800 leading-tight">ผศ.ดร. วุฒิพงษ์ พิชิตวงศ์</h3>
                     </div>
@@ -54,7 +62,7 @@
                 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/chitisan.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ชิติสรรค์&background=f97316&color=fff&bold=true';" alt="อ. ชิติสรรค์ วิชิโต" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ. ชิติสรรค์ วิชิโต</h3>
                     </div>
@@ -62,7 +70,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/thamagon.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ธรรมกร&background=f97316&color=fff&bold=true';" alt="ผศ. ธรรมกร ครองไตภพ" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">ผศ. ธรรมกร ครองไตภพ</h3>
                     </div>
@@ -70,7 +78,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/prakai.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ประกาย&background=f97316&color=fff&bold=true';" alt="อ. ประกาย นาดี" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ. ประกาย นาดี</h3>
                     </div>
@@ -78,7 +86,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/witaya.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=วิทยา&background=f97316&color=fff&bold=true';" alt="ผศ. วิทยา ศรีกุล" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">ผศ. วิทยา ศรีกุล</h3>
                     </div>
@@ -86,7 +94,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Ketkan.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=เกตุกาญจน์&background=f97316&color=fff&bold=true';" alt="อ.ดร. เกตุกาญจน์ ไชยพันธุ์" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ.ดร. เกตุกาญจน์ ไชยพันธุ์</h3>
                     </div>
@@ -94,7 +102,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Aphichat.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=อภิชาต&background=f97316&color=fff&bold=true';" alt="ผศ.ดร. อภิชาต ติประเสริฐสิน" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">ผศ.ดร. อภิชาต ติประเสริฐสิน</h3>
                     </div>
@@ -102,7 +110,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Phonphassorn.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=พรภัสสร&background=f97316&color=fff&bold=true';" alt="ผศ. พรภัสสร อ่อนเกิด" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">ผศ. พรภัสสร อ่อนเกิด</h3>
                     </div>
@@ -110,7 +118,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Supattra.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=สุภัทรา&background=f97316&color=fff&bold=true';" alt="อ. สุภัทรา เกิดเมฆ" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ. สุภัทรา เกิดเมฆ</h3>
                     </div>
@@ -118,7 +126,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Thipa.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ทิพา&background=f97316&color=fff&bold=true';" alt="อ. ทิพา กองศรีมา" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ. ทิพา กองศรีมา</h3>
                     </div>
@@ -126,7 +134,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Phutthawut.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=พุทธาวุฒิ&background=f97316&color=fff&bold=true';" alt="อ. พุทธาวุฒิ ถิกฤธร" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ. พุทธาวุฒิ ถิกฤธร</h3>
                     </div>
@@ -134,7 +142,7 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
                         <img src="photoarjan/Pheerachat.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=ภีระชาติ&background=f97316&color=fff&bold=true';" alt="อ.ดร. ภีระชาติ สุขสุทธิ์" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ.ดร. ภีระชาติ สุขสุทธิ์</h3>
                     </div>
@@ -142,8 +150,8 @@
 
                 <div class="flex flex-col items-center">
                     <span class="bg-orange-500 text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mb-1 shadow-sm line-clamp-1">อาจารย์ประจำสาขา</span>
-                    <div class="w-full bg-white rounded-2xl shadow-md border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px]">
-                        <img src="photoarjan/Ratiporn.png" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=รติพร&background=f97316&color=fff&bold=true';" alt="อ.ดร. รติพร จันทร์กลั่น" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
+                    <div class="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl border-2 border-orange-500 flex flex-col items-center justify-center p-2.5 sm:p-3 text-center min-h-[135px] transition-all">
+                        <img src="photoarjan/Ratiporn.gif" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=รติพร&background=f97316&color=fff&bold=true';" alt="อ.ดร. รติพร จันทร์กลั่น" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mb-1.5 border-2 border-orange-500 shadow-sm">
                         <h3 class="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 leading-tight">อ.ดร. รติพร จันทร์กลั่น</h3>
                     </div>
                 </div>
