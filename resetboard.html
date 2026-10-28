@@ -25,20 +25,109 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // ตัวแปรเก็บสถานะการเรียงลำดับ (ค่าเริ่มต้น: วันที่ล่าสุดขึ้นก่อน)
+        let currentSortField = 'date';
+        let currentSortOrder = 'desc';
+
         // 🗑️ ฟังก์ชันลบข้อมูลรายชื่อรายบุคคล
         window.deleteSingleLog = async function(docId, name) {
             if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ "${name}" ?`)) return;
 
             try {
                 await deleteDoc(doc(db, "leaderboard", docId));
-                window.fetchLogs(); // รีเฟรชตารางหลังจากลบสำเร็จ
+                window.fetchLogs(); // รีเฟรชตารางหลังลบสำเร็จ
             } catch (e) {
                 console.error(e);
                 alert("❌ เกิดข้อผิดพลาดในการลบ: " + e.message);
             }
         };
 
-        // 1. ดึงข้อมูล Log รายชื่อและคะแนน
+        // 📊 ฟังก์ชันคำนวณคะแนน
+        function getScoreVal(item) {
+            if (item.correctTotal !== undefined) return Number(item.correctTotal);
+            if (item.score !== undefined) return Math.floor(Number(item.score) / 100);
+            return 0;
+        }
+
+        // ⏱️ ฟังก์ชันแปลงวันที่เพื่อเปรียบเทียบเวลา
+        function getDateVal(item) {
+            if (item.createdAt) {
+                if (item.createdAt.seconds) return item.createdAt.seconds;
+                if (item.createdAt instanceof Date) return item.createdAt.getTime();
+            }
+            if (item.date) {
+                const parts = String(item.date).trim().split(' ');
+                if (parts.length === 2) {
+                    const d = parts[0].split('/');
+                    const t = parts[1].split(':');
+                    if (d.length === 3 && t.length === 2) {
+                        return Number(`${d[2]}${d[1].padStart(2,'0')}${d[0].padStart(2,'0')}${t[0].padStart(2,'0')}${t[1].padStart(2,'0')}`);
+                    }
+                }
+            }
+            return 0;
+        }
+
+        // 🔄 ฟังก์ชันสลับการเรียงลำดับเมื่อกดหัวตาราง
+        window.sortBy = function(field) {
+            if (currentSortField === field) {
+                currentSortOrder = (currentSortOrder === 'desc') ? 'asc' : 'desc';
+            } else {
+                currentSortField = field;
+                currentSortOrder = 'desc'; // ค่าเริ่มต้นเมื่อเปลี่ยนหัวข้อ ให้เรียงจากมากไปน้อย/ล่าสุดไปเก่าสุด
+            }
+            window.renderTable();
+        };
+
+        // 🎨 ฟังก์ชันวาดตารางและอัปเดตลูกศรสถานะ
+        window.renderTable = function() {
+            if (!window.currentLogs || window.currentLogs.length === 0) return;
+
+            // คัดลอกและจัดเรียงข้อมูล
+            let sorted = [...window.currentLogs];
+            sorted.sort((a, b) => {
+                let valA = currentSortField === 'score' ? getScoreVal(a) : getDateVal(a);
+                let valB = currentSortField === 'score' ? getScoreVal(b) : getDateVal(b);
+
+                if (valA < valB) return currentSortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // อัปเดตลูกศรบนหัวตาราง
+            const scoreIcon = currentSortField === 'score' ? (currentSortOrder === 'desc' ? ' ⬇️' : ' ⬆️') : ' ↕️';
+            const dateIcon = currentSortField === 'date' ? (currentSortOrder === 'desc' ? ' ⬇️ (ล่าสุด)' : ' ⬆️ (เก่าสุด)') : ' ↕️';
+
+            document.getElementById('th-score').innerHTML = `คะแนน ${scoreIcon}`;
+            document.getElementById('th-date').innerHTML = `วันที่ทำรายการ ${dateIcon}`;
+
+            // แสดงผลลงในตาราง
+            const tbody = document.getElementById('log-table-body');
+            tbody.innerHTML = '';
+            sorted.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-100 hover:bg-amber-50/40 text-xs sm:text-sm text-slate-700 transition-colors';
+                const safeName = String(item.name || '-').replace(/'/g, "\\'");
+                const scoreVal = getScoreVal(item);
+                
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-400">${idx + 1}</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800">${item.name || '-'}</td>
+                    <td class="py-2.5 px-3 text-slate-600">${item.school || '-'}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-orange-600">${scoreVal}/10</td>
+                    <td class="py-2.5 px-3 text-center text-slate-500 font-medium">${item.date || '-'}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button onclick="deleteSingleLog('${item.id}', '${safeName}')" 
+                                class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-2.5 py-1 rounded-lg text-xs shadow-sm active:scale-95 transition cursor-pointer">
+                            🗑️ ลบ
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // 1. ดึงข้อมูล Log รายชื่อและคะแนนจาก Cloud
         window.fetchLogs = async function() {
             const modal = document.getElementById('log-modal');
             const tbody = document.getElementById('log-table-body');
@@ -58,29 +147,8 @@
                     return;
                 }
 
-                tbody.innerHTML = '';
                 window.currentLogs = logs;
-
-                logs.forEach((item, idx) => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-slate-100 hover:bg-slate-50 text-xs sm:text-sm text-slate-700';
-                    const safeName = String(item.name || '-').replace(/'/g, "\\'");
-                    
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">${idx + 1}</td>
-                        <td class="py-2.5 px-3 font-semibold text-slate-800">${item.name || '-'}</td>
-                        <td class="py-2.5 px-3 text-slate-600">${item.school || '-'}</td>
-                        <td class="py-2.5 px-3 text-center font-bold text-orange-600">${item.correctTotal !== undefined ? item.correctTotal : (item.score ? Math.floor(item.score/100) : 0)}/10</td>
-                        <td class="py-2.5 px-3 text-center text-slate-500">${item.date || '-'}</td>
-                        <td class="py-2.5 px-3 text-center">
-                            <button onclick="deleteSingleLog('${item.id}', '${safeName}')" 
-                                    class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-2.5 py-1 rounded-lg text-xs shadow-sm active:scale-95 transition cursor-pointer">
-                                🗑️ ลบ
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                window.renderTable(); // วาดตารางครั้งแรกพร้อมเรียงลำดับ
             } catch (e) {
                 console.error(e);
                 tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-red-500 font-bold">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>';
@@ -133,7 +201,7 @@
             window.currentLogs.forEach((item, idx) => {
                 const name = `"${item.name || ''}"`;
                 const school = `"${item.school || ''}"`;
-                const score = item.correctTotal !== undefined ? item.correctTotal : (item.score ? Math.floor(item.score/100) : 0);
+                const score = getScoreVal(item);
                 const date = `"${item.date || ''}"`;
                 csvContent += `${idx + 1},${name},${school},${score},${date}\n`;
             });
@@ -195,7 +263,7 @@
         </div>
     </div>
 
-    <!-- Modal แสดงตาราง Log มีปุ่มลบรายชื่อ -->
+    <!-- Modal แสดงตาราง Log พร้อมปุ่มเรียงลำดับหัวตาราง -->
     <div id="log-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-40">
         <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border-t-8 border-amber-500">
             <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
@@ -209,11 +277,20 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
-                            <th class="py-2.5 px-3 text-center">#</th>
+                            <th class="py-2.5 px-3 text-center w-12">#</th>
                             <th class="py-2.5 px-3">ชื่อ-นามสกุล</th>
                             <th class="py-2.5 px-3">สังกัด/โรงเรียน</th>
-                            <th class="py-2.5 px-3 text-center">คะแนน</th>
-                            <th class="py-2.5 px-3 text-center">วันที่ทำรายการ</th>
+                            
+                            <!-- ปุ่มกดเรียงคะแนน -->
+                            <th id="th-score" onclick="sortBy('score')" class="py-2.5 px-3 text-center cursor-pointer hover:bg-amber-100/60 select-none transition-colors rounded-t-lg text-orange-600" title="คลิกเพื่อเรียงลำดับคะแนน">
+                                คะแนน ↕️
+                            </th>
+                            
+                            <!-- ปุ่มกดเรียงวันที่ -->
+                            <th id="th-date" onclick="sortBy('date')" class="py-2.5 px-3 text-center cursor-pointer hover:bg-amber-100/60 select-none transition-colors rounded-t-lg" title="คลิกเพื่อเรียงตามเวลาที่ทำ">
+                                วันที่ทำรายการ ⬇️ (ล่าสุด)
+                            </th>
+                            
                             <th class="py-2.5 px-3 text-center">จัดการ</th>
                         </tr>
                     </thead>
